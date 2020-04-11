@@ -10,9 +10,11 @@ IPAddress subnet(255, 255, 255, 0);
 //SETTING GPIOs PORTS (different from marked on board)
 const int PCled = 14; //D5
 const int PCbut = 05; //D1
-const int FANsw = A0; //A0
+const int FANs1 = 12; //D6
+const int FANs2 = 13; //D7
 const int PCstt = 00; //D3
-const int Relay = 16; //D0
+const int Relay = 05; //D1
+const int Buzzer = 04; //D2
 WiFiServer server(80);
 
 //SETTING GLOBAL VARIABLES
@@ -24,58 +26,52 @@ int RELAYstatus = 0;
 
 void setup() {
   // Serial for future testing.
-  Serial.begin(115200);
+  //Serial.begin(115200);
   delay(10);
 
   // Declare pins.
   pinMode(PCstt, OUTPUT);
   pinMode(Relay, OUTPUT);
+  pinMode(Buzzer, OUTPUT);
   digitalWrite(PCstt, LOW);
-  digitalWrite(Relay, HIGH);
+  digitalWrite(Relay, LOW);
   pinMode(PCled, INPUT_PULLUP);
   pinMode(PCbut, INPUT_PULLUP);
-  pinMode(FANsw, INPUT_PULLUP);
+  pinMode(FANs1, INPUT_PULLUP);
+  pinMode(FANs2, INPUT_PULLUP);
  
   // Connect to WiFi network, and start the server.
-  Serial.println("Welcome, connecting to wifi.");
+  //Serial.println("Welcome, connecting to wifi.");
   WiFi.config(ip, gateway, subnet);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(50);
   }
-  Serial.println("WiFi connected.");
+  //Serial.println("WiFi connected.");
   server.begin();
-  Serial.println("Server started. You can connect to it at http://192.168.1.19/"); 
+  //Serial.println("Server started. You can connect to it at http://192.168.1.19/"); 
 }
  
 void loop() {
-  Serial.print("PCstatus: ");
-  Serial.print(PCstatus);
-  Serial.print("  FANstatus: ");
-  Serial.print(analogRead(FANsw));
-  Serial.print("  RELAYstatus: ");
-  Serial.print(not(RELAYstatus));
-  Serial.print("  BUTstatus: ");
-  Serial.println(not(digitalRead(PCbut)));
   // Check physic inputs
   digitalWrite(PCstt, not(digitalRead(PCbut))); //Check PCbut.
   if (digitalRead(PCbut) == LOW and RELAYstatus == 0){//Turns on relay if needed.
     RELAYstatus = 1;
-    digitalWrite(Relay, LOW);
+    digitalWrite(Relay, HIGH);
   }
   PCstatus = not(digitalRead(PCled)); //Updates PCstatus.
-  if (analogRead(FANsw) < 10){ //Update FANstatus.
+  if (digitalRead(FANs1) == LOW){ //Update FANstatus.
     FANstatus = 2; //Only command-startup allowed.
   }
-  else if(analogRead(FANsw) > 800){
+  else if(digitalRead(FANs2) == LOW){
     FANstatus = 0; //Everything allowed.
   }
   else{
     FANstatus = 1; //Command allowed, but restinged web.
   }
-  if (PCstatus == 0 and RELAYstatus == 1){ //Turn off relay, if needed.
-     if (a==300) {
-      digitalWrite(Relay, HIGH);
+  if ((PCstatus == 0 and RELAYstatus == 1) and digitalRead(PCbut) == HIGH){ //Turn off relay, if needed.
+     if (a==1000) {
+      digitalWrite(Relay, LOW);
       RELAYstatus = 0;
      }
      else {
@@ -92,11 +88,11 @@ void loop() {
     return;
   }
   // Wait until the client sends some data (if he sends some)
-  Serial.println("New client");
+  //Serial.println("New client");
   i = 0;
   while(!client.available()){
     if (i == 100){
-      Serial.println("Fake client");
+      //Serial.println("Fake client");
       client.flush();
       return;
     }
@@ -105,7 +101,7 @@ void loop() {
   }
   // Read the first line of the request
   String request = client.readStringUntil('\r');
-  Serial.println(request);
+  //Serial.println(request);
   client.flush();
   // Match the request
   if (request.indexOf("/status") != -1)  {
@@ -130,11 +126,13 @@ void loop() {
     }
     else {
       RELAYstatus = 1;
-      digitalWrite(Relay, LOW);
+      digitalWrite(Relay, HIGH);
       delay(500);
       digitalWrite(PCstt, HIGH);
+      tone(Buzzer, 880);
       delay(500);
       digitalWrite(PCstt, LOW);
+      noTone(Buzzer);
       client.println("HTTP/1.1 200 OK");
       client.println("Content-Type: text/plain");
       client.println(""); // IMPORTANT
@@ -154,9 +152,11 @@ void loop() {
     }
     else if (PCstatus == 1){
       digitalWrite(PCstt, HIGH);
+      tone(Buzzer, 880);
       client.println("Done! Check status to verify it yourself.");
       delay(500);
       digitalWrite(PCstt, LOW);
+      noTone(Buzzer);
     }
     else {
       client.println("Error: PC is already off!");
@@ -171,11 +171,13 @@ void loop() {
     }
     else if (PCstatus == 1){
       digitalWrite(PCstt, HIGH);
+      tone(Buzzer, 880);
       client.println("Done! Check status to verify it yourself.");
       delay(6000);
       digitalWrite(PCstt, LOW);
+      noTone(Buzzer);
       delay(1000);
-      digitalWrite(Relay, HIGH);
+      digitalWrite(Relay, LOW);
       delay(500);
     }
     else {
@@ -192,7 +194,7 @@ void loop() {
     client.println("<p>To control this device, you need to go to the raspberry's page on http://192.168.1.20/ with the good codes.</p>");
     client.println("</html>");
   }
-  Serial.println("Client disonnected");
-  Serial.println("");
+  //Serial.println("Client disonnected");
+  //Serial.println("");
 }
  
