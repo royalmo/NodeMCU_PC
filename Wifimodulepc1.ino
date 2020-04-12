@@ -13,7 +13,7 @@ const int PCbut = 05; //D1
 const int FANs1 = 12; //D6
 const int FANs2 = 13; //D7
 const int PCstt = 00; //D3
-const int Relay = 05; //D1
+const int Relay = 15; //D8
 const int Buzzer = 04; //D2
 WiFiServer server(80);
 
