@@ -20,9 +20,10 @@ WiFiServer server(80);
 //SETTING GLOBAL VARIABLES
 int i = 0;
 int a = 0;
+bool b = true;
 int PCstatus = 0;
 int FANstatus = 0;
-int RELAYstatus = 0;
+int RELAYstatus = 1;
 
 void setup() {
   // Serial for future testing.
@@ -60,8 +61,8 @@ void loop() {
     delay(1000);
     digitalWrite(PCstt, HIGH);
     delay(500);
-  digitalWrite(PCstt, not(digitalRead(PCbut))); //Check PCbut.
   }
+  digitalWrite(PCstt, not(digitalRead(PCbut))); //Check PCbut.
   PCstatus = not(digitalRead(PCled)); //Updates PCstatus.
   if (digitalRead(FANs1) == LOW){ //Update FANstatus.
     FANstatus = 0; //Only command-startup allowed.
@@ -73,12 +74,13 @@ void loop() {
     FANstatus = 1; //Command allowed, but restinged web.
   }
   if ((PCstatus == 0 and RELAYstatus == 1) and digitalRead(PCbut) == HIGH){ //Turn off relay, if needed.
-     if (a==10000) {
+     if (a > 7000){
       digitalWrite(Relay, LOW);
       RELAYstatus = 0;
      }
      else {
       a++;
+      delay(1);
      }
   }
   else {
@@ -119,6 +121,8 @@ void loop() {
     client.println(RELAYstatus);
     client.print("BUTstatus: ");
     client.println(not(digitalRead(PCbut)));
+    client.print("First request: ");
+    client.println(b);
   }
   else if (request.indexOf("/pcstart") != -1)  {
     if (PCstatus == 1){
@@ -179,12 +183,32 @@ void loop() {
       delay(6000);
       digitalWrite(PCstt, LOW);
       noTone(Buzzer);
-      delay(1000);
+      delay(5000);
       digitalWrite(Relay, LOW);
       delay(500);
     }
     else {
       client.println("Error: PC is already off!");
+    }
+  }
+  else if (request.indexOf("/plugin") != -1)  {
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/plain");
+    client.println(""); // IMPORTANT
+    if (FANstatus != 0){
+      client.println("Error: You don't have the permissions to do this!");
+    }
+    else if (PCstatus == 0){
+      digitalWrite(Relay, HIGH);
+      RELAYstatus = 1;
+      client.println("Done! Check status to verify it yourself.");
+      delay(2000);
+      digitalWrite(PCstt, HIGH);
+      delay(500);
+      digitalWrite(PCstt, LOW);
+    }
+    else {
+      client.println("Error: PC is already on!");
     }
   }
   else {
@@ -199,5 +223,5 @@ void loop() {
   }
   //Serial.println("Client disonnected");
   //Serial.println("");
+  b = false;
 }
- 
