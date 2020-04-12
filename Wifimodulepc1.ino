@@ -34,7 +34,7 @@ void setup() {
   pinMode(Relay, OUTPUT);
   pinMode(Buzzer, OUTPUT);
   digitalWrite(PCstt, LOW);
-  digitalWrite(Relay, LOW);
+  digitalWrite(Relay, HIGH);
   pinMode(PCled, INPUT_PULLUP);
   pinMode(PCbut, INPUT_PULLUP);
   pinMode(FANs1, INPUT_PULLUP);
@@ -54,23 +54,26 @@ void setup() {
  
 void loop() {
   // Check physic inputs
-  digitalWrite(PCstt, not(digitalRead(PCbut))); //Check PCbut.
   if (digitalRead(PCbut) == LOW and RELAYstatus == 0){//Turns on relay if needed.
     RELAYstatus = 1;
     digitalWrite(Relay, HIGH);
+    delay(1000);
+    digitalWrite(PCstt, HIGH);
+    delay(500);
+  digitalWrite(PCstt, not(digitalRead(PCbut))); //Check PCbut.
   }
   PCstatus = not(digitalRead(PCled)); //Updates PCstatus.
   if (digitalRead(FANs1) == LOW){ //Update FANstatus.
-    FANstatus = 2; //Only command-startup allowed.
+    FANstatus = 0; //Only command-startup allowed.
   }
   else if(digitalRead(FANs2) == LOW){
-    FANstatus = 0; //Everything allowed.
+    FANstatus = 2; //Everything allowed.
   }
   else{
     FANstatus = 1; //Command allowed, but restinged web.
   }
   if ((PCstatus == 0 and RELAYstatus == 1) and digitalRead(PCbut) == HIGH){ //Turn off relay, if needed.
-     if (a==1000) {
+     if (a==10000) {
       digitalWrite(Relay, LOW);
       RELAYstatus = 0;
      }
@@ -127,9 +130,9 @@ void loop() {
     else {
       RELAYstatus = 1;
       digitalWrite(Relay, HIGH);
-      delay(500);
-      digitalWrite(PCstt, HIGH);
       tone(Buzzer, 880);
+      delay(1000);
+      digitalWrite(PCstt, HIGH);
       delay(500);
       digitalWrite(PCstt, LOW);
       noTone(Buzzer);
