@@ -1,227 +1,242 @@
 #include <ESP8266WiFi.h>
 
-//NETWORK SETTINGS
+/*   THIS CODE IS FOR CONTROLLING REMOTELY A PC, WITH A NODE-MCU BOARD. Look at README.md
+ * ========================================================================================
+ * Made by Eric Roy. Check more info and copyright at https://github.com/royalmo/NodeMCU_PC
+ *  */
+ 
+//NETWORK SETTINGS (Things that you have to change)
 const char* ssid = "Fibracat_16052";
 const char* password = "243dcab8cb";
 IPAddress ip(192, 168, 1, 19);
 IPAddress gateway(192, 168, 1, 0);
 IPAddress subnet(255, 255, 255, 0);
 
+//GLOBAL VARIABLES
+WiFiServer server(80);
+WiFiClient client;
+String request;
+unsigned long timeCheck = 0;
+
 //SETTING GPIOs PORTS (different from marked on board)
-const int PCled = 14; //D5
-const int PCbut = 05; //D1
+const int PCsensor = 14; //D5
+const int CASEbut = 05; //D1
 const int FANs1 = 12; //D6
 const int FANs2 = 13; //D7
-const int PCstt = 00; //D3
+const int PCstartBUT = 00; //D3
 const int Relay = 15; //D8
 const int Buzzer = 04; //D2
-WiFiServer server(80);
 
-//SETTING GLOBAL VARIABLES
-int i = 0;
-int a = 0;
-bool b = true;
-int PCstatus = 0;
-int FANstatus = 0;
-int RELAYstatus = 1;
-
-void setup() {
-  // Serial for future testing.
-  //Serial.begin(115200);
-  delay(10);
-
-  // Declare pins.
-  pinMode(PCstt, OUTPUT);
-  pinMode(Relay, OUTPUT);
-  pinMode(Buzzer, OUTPUT);
-  digitalWrite(PCstt, LOW);
-  digitalWrite(Relay, HIGH);
-  pinMode(PCled, INPUT_PULLUP);
-  pinMode(PCbut, INPUT_PULLUP);
-  pinMode(FANs1, INPUT_PULLUP);
-  pinMode(FANs2, INPUT_PULLUP);
- 
-  // Connect to WiFi network, and start the server.
-  //Serial.println("Welcome, connecting to wifi.");
-  WiFi.config(ip, gateway, subnet);
+void WIFIconnect() {
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(50);
+    delay(1);
   }
-  //Serial.println("WiFi connected.");
-  server.begin();
-  //Serial.println("Server started. You can connect to it at http://192.168.1.19/"); 
 }
- 
-void loop() {
-  // Check physic inputs
-  if (digitalRead(PCbut) == LOW and RELAYstatus == 0){//Turns on relay if needed.
-    RELAYstatus = 1;
-    digitalWrite(Relay, HIGH);
-    delay(1000);
-    digitalWrite(PCstt, HIGH);
-    delay(500);
+
+bool newClient(){
+  //Checks if a new client has connected, and so, if the sketch can continue.
+  client = server.available();
+  if (!client) {
+    return 1;
   }
-  digitalWrite(PCstt, not(digitalRead(PCbut))); //Check PCbut.
-  PCstatus = not(digitalRead(PCled)); //Updates PCstatus.
-  if (digitalRead(FANs1) == LOW){ //Update FANstatus.
-    FANstatus = 0; //Only command-startup allowed.
+  unsigned long start_time = millis();;
+  while(!client.available()){
+    if ((start_time + 100) < millis()){
+      client.flush();
+      return 1;
+      //Fake client (Chrome for desktop does this a lot).
+    }
+    delay(1);
   }
-  else if(digitalRead(FANs2) == LOW){
-    FANstatus = 2; //Everything allowed.
-  }
-  else{
-    FANstatus = 1; //Command allowed, but restinged web.
-  }
-  if ((PCstatus == 0 and RELAYstatus == 1) and digitalRead(PCbut) == HIGH){ //Turn off relay, if needed.
-     if (a > 7000){
+  request = client.readStringUntil('\r');
+  client.flush();
+  return 0;
+}
+
+void checkUnplug(){
+  if (not(PCvalue()) and RELAYvalue()){ 
+     if (timeCheck > 7000){
       digitalWrite(Relay, LOW);
-      RELAYstatus = 0;
+      timeCheck = 0;
      }
      else {
-      a++;
+      timeCheck++;
       delay(1);
      }
   }
   else {
-    a = 0;
+    timeCheck = 0;
   }
+}
+
+void PCstart() {
+  //Sequence for starting the computer.
+  digitalWrite(Relay, HIGH);
+  delay(400);
+  digitalWrite(PCstartBUT, HIGH);
+  delay(400);
+  digitalWrite(PCstartBUT, LOW);
+}
+
+void PCshutdown() {
+  digitalWrite(PCstartBUT, HIGH);
+  tone(Buzzer, 880);
+  delay(500);
+  digitalWrite(PCstartBUT, LOW);
+  noTone(Buzzer);
+}
+
+void FORCEshutdown(){
+  //Sequence for shuting down the computed, in forced mode.
+  digitalWrite(PCstartBUT, HIGH);
+  tone(Buzzer, 880);
+  delay(6000);
+  digitalWrite(PCstartBUT, LOW);
+  noTone(Buzzer);
+  delay(5000);
+  digitalWrite(Relay, LOW);
+}
+
+int caseBut() {
+  return not(digitalRead(CASEbut));
+}
+
+int FANvalue() {
+  //Checks FAN value.
+  if (digitalRead(FANs1) == LOW){
+    //Only command-startup allowed.
+    return 0;
+  }
+  else if(digitalRead(FANs2) == LOW){
+    //Everything is allowed.
+    return 2;
+  }
+  else{
+    //Command allowed except forced shutdown, but only startup via web.
+    return 1;
+  }
+}
+
+int PCvalue() {
+  //Checks PC status
+  return not(digitalRead(PCsensor));
+}
+
+int RELAYvalue() {
+  //Returns Relay value
+  return digitalRead(Relay);
+}
+
+void PRINTmessage(int code){
+  //This function prints obligatory header for http response, and the response depending on the code given.
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: text/plain");
+  client.println(""); // IMPORTANT
+  switch (code) {
+    case 0 : 
+      client.println("Done! Check status to verify it yourself.");
+      break;
+    case 1 :
+      client.println("Error: PC is already off!");
+      break;
+    case 2 :
+      client.println("Error: PC is already on!");
+      break;
+    case 3 :
+      client.println("Error: You don't have the permissions to do this!");
+      break;
+    case 4 :
+      client.print("PCstate: " + String(PCvalue()) + "\nFANvalue: " + String(FANvalue()) + "\nRELAYstatus: " + String(RELAYvalue()));
+      break;
+    case 5 :
+      client.println("Eric's PC controller.\nTo control this device, you need to go to the raspberry's page on http://192.168.1.20/ with the good codes.");
+      break;
+  }
+}
+
+void setup() {
+  // DECLARE PINS
+  pinMode(PCstartBUT, OUTPUT);
+  pinMode(Relay, OUTPUT);
+  pinMode(Buzzer, OUTPUT);
+  digitalWrite(PCstartBUT, LOW);
+  digitalWrite(Relay, LOW);
+  pinMode(PCsensor, INPUT_PULLUP);
+  pinMode(CASEbut, INPUT_PULLUP);
+  pinMode(FANs1, INPUT_PULLUP);
+  pinMode(FANs2, INPUT_PULLUP);
+ 
+  // CONNECT TO NETWORK.
+  WiFi.setAutoReconnect(true);
+  WiFi.config(ip, gateway, subnet);
+  WIFIconnect();
+  server.begin();
+}
+ 
+void loop() {
+  // MANUAL CASE BUTTON UPDATE.
+  if (caseBut()) {
+    if (RELAYvalue() == LOW) {
+      PCstart();
+    }
+    else {
+      while (caseBut()){
+        digitalWrite(PCstartBUT, HIGH);
+        delay(1);
+      }
+      digitalWrite(PCstartBUT, LOW);
+    }
+  }
+
+  // CHECK IF RELAY CAN BE TURNED OFF
+  checkUnplug();
   
-  // Check if a client has connected
-  WiFiClient client = server.available();
-  if (!client) {
+  // LOOK FOR A CLIENT AND REQUEST
+  if (newClient()){
     return;
   }
-  // Wait until the client sends some data (if he sends some)
-  //Serial.println("New client");
-  i = 0;
-  while(!client.available()){
-    if (i == 100){
-      //Serial.println("Fake client");
-      client.flush();
-      return;
-    }
-    i++;
-    delay(1);
-  }
-  // Read the first line of the request
-  String request = client.readStringUntil('\r');
-  //Serial.println(request);
-  client.flush();
-  // Match the request
+  
+  // MAKE REQUEST
   if (request.indexOf("/status") != -1)  {
-    client.println("HTTP/1.1 200 OK");
-    client.println("Content-Type: text/plain");
-    client.println(""); // IMPORTANT
-    client.print("PCstatus: ");
-    client.println(PCstatus);
-    client.print("FANstatus: ");
-    client.println(FANstatus);
-    client.print("RELAYstatus: ");
-    client.println(RELAYstatus);
-    client.print("BUTstatus: ");
-    client.println(not(digitalRead(PCbut)));
-    client.print("First request: ");
-    client.println(b);
+    PRINTmessage(4);
   }
-  else if (request.indexOf("/pcstart") != -1)  {
-    if (PCstatus == 1){
-      client.println("HTTP/1.1 200 OK");
-      client.println("Content-Type: text/plain");
-      client.println(""); // IMPORTANT
-      client.println("Error: PC is already on!");
+  else if (request.indexOf("/start") != -1)  {
+    if (PCvalue()){
+      PRINTmessage(2);
     }
     else {
-      RELAYstatus = 1;
-      digitalWrite(Relay, HIGH);
       tone(Buzzer, 880);
-      delay(1000);
-      digitalWrite(PCstt, HIGH);
-      delay(500);
-      digitalWrite(PCstt, LOW);
+      PCstart();
       noTone(Buzzer);
-      client.println("HTTP/1.1 200 OK");
-      client.println("Content-Type: text/plain");
-      client.println(""); // IMPORTANT
-      client.println("Done! Check status to verify it yourself.");
+      PRINTmessage(0);
     }
-  }
-  else if (request.indexOf("/favicon.ico") != -1)  {
-    client.println("HTTP/1.1 404 NO ICON");
-    client.println("");
   }
   else if (request.indexOf("/shutdown") != -1)  {
-    client.println("HTTP/1.1 200 OK");
-    client.println("Content-Type: text/plain");
-    client.println(""); // IMPORTANT
-    if (FANstatus == 2){
-      client.println("Error: You don't have the permissions to do this!");
+    if (FANvalue() == 2){
+      PRINTmessage(3);
     }
-    else if (PCstatus == 1){
-      digitalWrite(PCstt, HIGH);
-      tone(Buzzer, 880);
-      client.println("Done! Check status to verify it yourself.");
-      delay(500);
-      digitalWrite(PCstt, LOW);
-      noTone(Buzzer);
+    else if (PCvalue()){
+      PCshutdown();
+      PRINTmessage(0);
     }
     else {
-      client.println("Error: PC is already off!");
+      PRINTmessage(1);
     }
   }
   else if (request.indexOf("/forceshutdown") != -1)  {
-    client.println("HTTP/1.1 200 OK");
-    client.println("Content-Type: text/plain");
-    client.println(""); // IMPORTANT
-    if (FANstatus != 0){
-      client.println("Error: You don't have the permissions to do this!");
+    if (FANvalue() != 0){
+      PRINTmessage(3);
     }
-    else if (PCstatus == 1){
-      digitalWrite(PCstt, HIGH);
-      tone(Buzzer, 880);
-      client.println("Done! Check status to verify it yourself.");
-      delay(6000);
-      digitalWrite(PCstt, LOW);
-      noTone(Buzzer);
-      delay(5000);
-      digitalWrite(Relay, LOW);
-      delay(500);
+    else if (PCvalue()){
+      FORCEshutdown();
+      PRINTmessage(0);
     }
     else {
-      client.println("Error: PC is already off!");
-    }
-  }
-  else if (request.indexOf("/plugin") != -1)  {
-    client.println("HTTP/1.1 200 OK");
-    client.println("Content-Type: text/plain");
-    client.println(""); // IMPORTANT
-    if (FANstatus != 0){
-      client.println("Error: You don't have the permissions to do this!");
-    }
-    else if (PCstatus == 0){
-      digitalWrite(Relay, HIGH);
-      RELAYstatus = 1;
-      client.println("Done! Check status to verify it yourself.");
-      delay(2000);
-      digitalWrite(PCstt, HIGH);
-      delay(500);
-      digitalWrite(PCstt, LOW);
-    }
-    else {
-      client.println("Error: PC is already on!");
+      PRINTmessage(1);
     }
   }
   else {
-    client.println("HTTP/1.1 200 OK");
-    client.println("Content-Type: text/html");
-    client.println(""); // IMPORTANT
-    client.println("<html>");
-    client.println("<h1>Eric's PC config</h1>");
-    client.println("<br>");
-    client.println("<p>To control this device, you need to go to the raspberry's page on http://192.168.1.20/ with the good codes.</p>");
-    client.println("</html>");
+    PRINTmessage(5);
   }
-  //Serial.println("Client disonnected");
-  //Serial.println("");
-  b = false;
 }
