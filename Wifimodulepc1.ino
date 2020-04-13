@@ -147,7 +147,7 @@ void PRINTmessage(int code){
       client.println("Error: You don't have the permissions to do this!");
       break;
     case 4 :
-      client.print("PCstate: " + String(PCvalue()) + "\nFANvalue: " + String(FANvalue()) + "\nRELAYstatus: " + String(RELAYvalue()));
+      client.println("PCstate: " + String(PCvalue()) + "\nFANvalue: " + String(FANvalue()) + "\nRELAYstatus: " + String(RELAYvalue()));
       break;
     case 5 :
       client.println("Eric's PC controller.\nTo control this device, you need to go to the raspberry's page on http://192.168.1.20/ with the good codes.");
