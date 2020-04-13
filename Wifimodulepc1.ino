@@ -6,9 +6,9 @@
  *  */
  
 //NETWORK SETTINGS (Things that you have to change)
-const char* ssid = "Fibracat_16052";
-const char* password = "243dcab8cb";
-IPAddress ip(192, 168, 1, 19);
+const char* ssid = "**************"; //Put your LAN settings.
+const char* password = "**********";
+IPAddress ip(192, 168, 1, 19); //Define the best settings for you.
 IPAddress gateway(192, 168, 1, 0);
 IPAddress subnet(255, 255, 255, 0);
 
@@ -150,7 +150,7 @@ void PRINTmessage(int code){
       client.println("PCstate: " + String(PCvalue()) + "\nFANvalue: " + String(FANvalue()) + "\nRELAYstatus: " + String(RELAYvalue()));
       break;
     case 5 :
-      client.println("Eric's PC controller.\nTo control this device, you need to go to the raspberry's page on http://192.168.1.20/ with the good codes.");
+      client.println("Eric's PC controller.\nTo control this device, you need to go to the webs with the good codes.");
       break;
   }
 }
