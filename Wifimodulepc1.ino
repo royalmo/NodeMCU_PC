@@ -177,7 +177,7 @@ void setup() {
 void loop() {
   // MANUAL CASE BUTTON UPDATE.
   if (caseBut()) {
-    if (RELAYvalue() == LOW) {
+    if (not(RELAYvalue())) {
       PCstart();
     }
     else {
