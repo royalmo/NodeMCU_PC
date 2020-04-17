@@ -4,13 +4,14 @@
  * ========================================================================================
  * Made by Eric Roy. Check more info and copyright at https://github.com/royalmo/NodeMCU_PC
  *  */
- 
+
 //NETWORK SETTINGS (Things that you have to change)
 const char* ssid = "**************"; //Put your LAN settings.
 const char* password = "**********";
-IPAddress ip(192, 168, 1, 19); //Define the best settings for you.
+IPAddress ip(192, 168, 1, 99); //Define the best settings for you. I putted example IPs.
 IPAddress gateway(192, 168, 1, 0);
 IPAddress subnet(255, 255, 255, 0);
+IPAdress raspberry_ip(192, 168, 1, 24); //You need to configure the raspberry's static IP on the board or the router.
 
 //GLOBAL VARIABLES
 WiFiServer server(80);
@@ -55,7 +56,7 @@ bool newClient(){
 }
 
 void checkUnplug(){
-  if (not(PCvalue()) and RELAYvalue()){ 
+  if (not(PCvalue()) and RELAYvalue()){
      if (timeCheck > 7000){
       digitalWrite(Relay, LOW);
       timeCheck = 0;
@@ -134,7 +135,7 @@ void PRINTmessage(int code){
   client.println("Content-Type: text/plain");
   client.println(""); // IMPORTANT
   switch (code) {
-    case 0 : 
+    case 0 :
       client.println("Done! Check status to verify it yourself.");
       break;
     case 1 :
@@ -166,14 +167,14 @@ void setup() {
   pinMode(CASEbut, INPUT_PULLUP);
   pinMode(FANs1, INPUT_PULLUP);
   pinMode(FANs2, INPUT_PULLUP);
- 
+
   // CONNECT TO NETWORK.
   WiFi.setAutoReconnect(true);
   WiFi.config(ip, gateway, subnet);
   WIFIconnect();
   server.begin();
 }
- 
+
 void loop() {
   // MANUAL CASE BUTTON UPDATE.
   if (caseBut()) {
@@ -191,12 +192,17 @@ void loop() {
 
   // CHECK IF RELAY CAN BE TURNED OFF
   checkUnplug();
-  
+
   // LOOK FOR A CLIENT AND REQUEST
   if (newClient()){
     return;
   }
-  
+
+  //CHECK IF CLIENT IS THE RASPBERRY
+  if (client.remoteIP() != raspberry_ip) {
+    PRINTmessage(3);
+    return;
+  }
   // MAKE REQUEST
   if (request.indexOf("/status") != -1)  {
     PRINTmessage(4);
