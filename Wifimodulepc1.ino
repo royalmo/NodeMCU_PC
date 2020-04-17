@@ -99,6 +99,10 @@ void FORCEshutdown(){
 }
 
 int caseBut() {
+  if (digitalRead(CASEbut)){
+    return false;
+  }
+  delay(100);
   return not(digitalRead(CASEbut));
 }
 
@@ -181,7 +185,7 @@ void loop() {
       PCstart();
     }
     else {
-      while (caseBut()){
+      while (not(digitalRead(CASEbut))){
         digitalWrite(PCstartBUT, HIGH);
         delay(1);
       }
