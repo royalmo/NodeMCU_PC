@@ -19,7 +19,7 @@ Then, install the libraries:
 ```
 pip install telepot
 ```
-Add the following command at the bottom of the file `/etc/rc.local` , before the `fi` command:
+Add the following command at the bottom of the file `/etc/rc.local`, before the `fi` command:
 ```
 python /the/path/of/the/NodeMCU_PC/telegrambot.py &
 ```

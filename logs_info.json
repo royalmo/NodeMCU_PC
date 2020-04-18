@@ -1,4 +1,6 @@
 {
-  "users" : "logs/messages/001.txt"
-  "status" : "logs/status/001.txt"
+  "msgs-actual" : "logs/messages/1587237841.log",
+  "status-actual" : "logs/status/1587237841.log",
+  "msgs-saved" : {},
+  "status-saved" : {}
 }

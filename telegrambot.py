@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import time
 import random
 import datetime
@@ -29,16 +30,22 @@ global bot = telepot.Bot('*** INSERT TOKEN ***') #INSERT YOUR TELEGRAM BOT TOKEN
 global login_key = '****' #INSERT PASSWORD TO LOGIN
 global action_key = '****' #INSERT PASSWORD TO GET STATUS WHEN LOGOUT OR TO START PC WHEN LOGIN
 
+def directory_path():  #CHANGE DIRECTORY PATH IF NEEDED
+    return '/home/pi/NodeMCU_PC/'
+
 if __name__ == "__main__":
     global bot
     MessageLoop(bot, handle).run_as_thread()
     while 1:
         time.sleep(10)
 
-def handle(msg):
+def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
     chat_id = msg['chat']['id']
     message = msg['text']
+    date = msg['date']
+    name = msg['chat']['first_name']
 
+    #SEND MESSAGE TO LOGS
     print 'Got message: %s' % message
 
     if message == '/start' or 'teniente' in message:
@@ -55,6 +62,8 @@ def wget_mcu(extension): #This function returns the content of a webpage (and do
 def get_user_info(chat_id): #This function returns op level of user, and previous status.
     with open('allowed_users.json', 'r') as filein:
         users = json.loads(filein)
-    if chat_id in users.get('op-3'):
+    if chat_id in users['op-3']:
         return [3, ]
     return result;
+
+time.time()
