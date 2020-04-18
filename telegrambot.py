@@ -6,6 +6,7 @@ import telepot
 from telepot.loop import MessageLoop
 from requests import get
 import json
+from pctracker import updatepc
 
 '''
 This script controls a Telegram bot, to make sure that it is possible to power on and off the ESP8266 module, and the PC that it is connected to.

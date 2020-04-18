@@ -152,7 +152,7 @@ void PRINTmessage(int code){
       client.println("Error: You don't have the permissions to do this!");
       break;
     case 4 :
-      client.println("PCstate: " + String(PCvalue()) + "\nFANvalue: " + String(FANvalue()) + "\nRELAYstatus: " + String(RELAYvalue()));
+      client.println("PCstatus: " + String(PCvalue()) + " FANvalue: " + String(FANvalue()));
       break;
     case 5 :
       client.println("Eric's PC controller.\nTo control this device, you need to go to the webs with the good codes.");
@@ -207,7 +207,7 @@ void loop() {
     PRINTmessage(3);
     return;
   }
-  
+
   // MAKE REQUEST
   if (request.indexOf("/status") != -1)  {
     PRINTmessage(4);
