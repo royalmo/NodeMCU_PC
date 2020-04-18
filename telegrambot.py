@@ -45,7 +45,7 @@ def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
     message = msg['text']
     date = msg['date']
     name = msg['chat']['first_name']
-
+    insertonlog(date, chat_id, message)
     #SEND MESSAGE TO LOGS
     print 'Got message: %s' % message
 
@@ -55,6 +55,26 @@ def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
     elif command == '/time':
         bot.sendMessage(chat_id, str(datetime.datetime.now()))
 random.randint(1,6)
+
+def insertonlog(date, chat_id, message):
+    with open((directory_path() + 'logs_info.log'), 'r') as filein:
+        loginfo = json.loads(filein)
+    with open((directory_path() + loginfo['msgs-actual']), 'r') as filein:
+        lines = len(filein.split('\n'))
+    result = str(date) + '> ChatID: ' + str(chat_id) + '> Message: ' + message
+    if lines < 100:
+        with open((directory_path() + loginfo['msgs-actual']), 'a') as filein:
+            filein.write(result)
+    else: #IF LOG FILE IS FULL (+100 lines) IT CREATES ANOTHER
+        newlog = loginfo
+        newlog['msgs-saved'][loginfo['msgs-actual']] = time.time()
+        newfile = 'logs/messages/' + str(int(time.time())) + '.log'
+        newlog['msgs-actual'] = newfile
+        fout = open((directory_path() +'logs_info.json'), 'w')
+        fout.write(json.dumps(newlog))
+        fout.close()
+        with open((directory_path() + newfile), 'w') as filein:
+            filein.write(result)
 
 def wget_mcu(extension): #This function returns the content of a webpage (and does included actions).
     global node_mcu_ip

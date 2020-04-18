@@ -17,20 +17,20 @@ def updatepc(from_bot = False):
         filein = filein.split('\n')
         lines = len(filein)
         latest = filein[lines - 1]
-    result = wget_mcu('/status')
-    if not(result in latest):
+    result = '>>> ' + wget_mcu('/status')
+    if not(result in latest): #UPDATES LOG FILE IF NECESSARY
         if from_bot:
             result+= '[Requested by Telegram bot]'
         if lines < 100:
             with open((directory_path() + loginfo['status-actual']), 'a') as filein:
                 filein.write('\n' + str(datetime.datetime.now()) + result)
-        else:
-            result = loginfo
-            result['status-saved'][loginfo['status-actual']] = time.time()
+        else: #IF LOG FILE IS FULL (+100 lines) IT CREATES ANOTHER
+            newlog = loginfo
+            newlog['status-saved'][loginfo['status-actual']] = time.time()
             newfile = 'logs/status/' + str(int(time.time())) + '.log'
-            result['status-actual'] = newfile
+            newlog['status-actual'] = newfile
             fout = open((directory_path() +'logs_info.json'), 'w')
-            fout.write(json.dumps(result))
+            fout.write(json.dumps(newlog))
             fout.close()
             with open((directory_path() + newfile), 'w') as filein:
                 filein.write(str(datetime.datetime.now()) + result)
