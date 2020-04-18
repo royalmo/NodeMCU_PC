@@ -207,6 +207,7 @@ void loop() {
     PRINTmessage(3);
     return;
   }
+  
   // MAKE REQUEST
   if (request.indexOf("/status") != -1)  {
     PRINTmessage(4);

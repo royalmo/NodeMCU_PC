@@ -12,18 +12,18 @@ If you want to copy my design, you will need the following components:
 * Aaaaaaaaaaaand a Telegram account, sounds also obvious!
 
 ## How to install it?
-You first need to make all the connections on the ESP8266 board, and copy the code with the arduino IDE and the ESP8266 library. Remember to change the network settings! 
+You first need to make all the connections on the ESP8266 board, and copy the code with the arduino IDE and the ESP8266 library. Remember to change the network settings!
 
-Then, just go to the Raspberry Board (with Raspbian and internet access) and download the python file. Remember to change the bot token and put yours, and the ip adress that you inserted on the NodeMCU board! 
+Then, just go to the Raspberry Board (with Raspbian and internet access) and download the whole repository. Remember to change the bot token and put yours in the python file, and the ip adress that you inserted on the NodeMCU board!
 Then, install the libraries:
 ```
 pip install telepot
 ```
-Add the following command at the bottom of the file `/etc/rc.local`
+Add the following command at the bottom of the file `/etc/rc.local` , before the `fi` command:
 ```
-python /the/path/of/the/python/file.py &
+python /the/path/of/the/NodeMCU_PC/telegrambot.py &
 ```
-That way, the bot will always be active when the raspberry is on.
+That way, the bot will always be active when the raspberry is on. Now you just have to restart the raspberry in order to apply changes.
 
 ## How do I use it?
 Just need to acces your telegram bot, with the codes that you introduced in you python file. If they are the same as mines, its just commands like /start, /status, and so on. If you don't have a Fan switch plugged into the NodeMCU you should remove that part of the code.
