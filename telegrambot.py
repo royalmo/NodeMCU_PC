@@ -59,7 +59,7 @@ def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
 
     update_user_op(chat_id, oldop, newop)
     update_user_status(chat_id, op, newstatus)
-    wget_mcu('/start')
+    wget_mcu('/start') # /status /data /shutdown
 
 #public commands: /start /stop /help
 #private keywords: panorama ascenso ejecuta paralo todo
@@ -91,7 +91,7 @@ def wget_mcu(extension): #This function returns the content of a webpage (and do
     global node_mcu_ip
     result = get(node_mcu_ip + extension).content
     time.sleep(10)
-    if extension != '/status':
+    if extension != '/status' or extension != '/data':
         updatepc()
     return result
 

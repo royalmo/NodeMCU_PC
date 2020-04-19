@@ -157,6 +157,9 @@ void PRINTmessage(int code){
     case 5 :
       client.println("Eric's PC controller.\nTo control this device, you need to go to the webs with the good codes.");
       break;
+    case 6 :
+      client.println(String(PCvalue()) + String(FANvalue()));
+      break;
   }
 }
 
@@ -211,6 +214,9 @@ void loop() {
   // MAKE REQUEST
   if (request.indexOf("/status") != -1)  {
     PRINTmessage(4);
+  }
+  if (request.indexOf("/data") != -1)  {
+    PRINTmessage(6);
   }
   else if (request.indexOf("/start") != -1)  {
     if (PCvalue()){
