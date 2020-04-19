@@ -75,7 +75,7 @@ def insertonlog(date, chat_id, message):
     result = str(date) + '> ChatID: ' + str(chat_id) + '> Message: ' + message
     if lines < 100:
         with open((directory_path() + loginfo['msgs-actual']), 'a') as filein:
-            filein.write(result)
+            filein.write('\n' + result)
     else: #IF LOG FILE IS FULL (+100 lines) IT CREATES ANOTHER
         newlog = loginfo
         newlog['msgs-saved'][loginfo['msgs-actual']] = time.time()
