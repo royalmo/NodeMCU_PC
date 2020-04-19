@@ -51,17 +51,15 @@ def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
     status = user_info[1]
 
 
-    wget_mcu('/start')
-
     if message == '/start' or 'teniente' in message:
         bot.sendMessage(chat_id, "Muy buenas, ¿con quién estoy hablando?")
 
-    elif command == '/time':
+    elif 'panorama' in message:
         bot.sendMessage(chat_id, str(datetime.datetime.now()))
-        random.randint(1,6)
 
-    # update_user_op(chat_id, oldop, newop)
-    # update_user_status(chat_id, op, newstatus)
+    update_user_op(chat_id, oldop, newop)
+    update_user_status(chat_id, op, newstatus)
+    wget_mcu('/start')
 
 #public commands: /start /stop /help
 #private keywords: panorama ascenso ejecuta paralo todo
