@@ -12,9 +12,9 @@ if __name__ == '__main__':
 
 def updatepc(from_bot = True):
     with open((directory_path() + 'logs_info.log'), 'r') as filein:
-        loginfo = json.loads(filein)
+        loginfo = json.loads(filein.read())
     with open((directory_path() + loginfo['status-actual']), 'r') as filein:
-        filein = filein.split('\n')
+        filein = filein.read().split('\n')
         lines = len(filein)
         latest = filein[lines - 1]
     result = '>>> ' + wget_mcu('/status')[0:-1]

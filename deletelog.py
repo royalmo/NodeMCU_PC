@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
 def remove_old():
     with open((directory_path() +'logs_info.json'), 'r') as filein:
-        loginfo = json.loads(filein)
+        loginfo = json.loads(filein.read())
     result = {'msgs-actual': loginfo['msgs-actual'], 'status-actual' : loginfo['status-actual'], 'msgs-saved' : {}, 'status-saved' : {}}
     for filename, saved in loginfo['msgs-saved'].items():
         if (saved + 2592000) < time.time():
