@@ -42,19 +42,32 @@ if __name__ == "__main__":
 
 def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
     chat_id = msg['chat']['id']
-    message = msg['text']
+    message = msg['text'].replace('\n', ' |n ')
     date = msg['date']
     name = msg['chat']['first_name']
-    insertonlog(date, chat_id, message)
-    #SEND MESSAGE TO LOGS
-    print 'Got message: %s' % message
+    insertonlog(date, chat_id, message) #SEND MESSAGE TO LOGS
+    user_info = get_user_info(chat_id)
+    op = user_info[0]
+    status = user_info[1]
+
+
+    wget_mcu('/start')
 
     if message == '/start' or 'teniente' in message:
         bot.sendMessage(chat_id, "Muy buenas, ¿con quién estoy hablando?")
 
     elif command == '/time':
         bot.sendMessage(chat_id, str(datetime.datetime.now()))
-random.randint(1,6)
+        random.randint(1,6)
+
+    # update_user_op(chat_id, oldop, newop)
+    # update_user_status(chat_id, op, newstatus)
+
+#public commands: /start /stop /help
+#private keywords: panorama ascenso ejecuta paralo todo
+
+#END MAIN FUNCTION
+
 
 def insertonlog(date, chat_id, message):
     with open((directory_path() + 'logs_info.log'), 'r') as filein:
@@ -78,13 +91,34 @@ def insertonlog(date, chat_id, message):
 
 def wget_mcu(extension): #This function returns the content of a webpage (and does included actions).
     global node_mcu_ip
-    return get(node_mcu_ip + extension).content
+    result = get(node_mcu_ip + extension).content
+    time.sleep(10)
+    if extension != '/status':
+        updatepc()
+    return result
 
 def get_user_info(chat_id): #This function returns op level of user, and previous status.
-    with open('allowed_users.json', 'r') as filein:
+    with open((directory_path() + 'allowed_users.json'), 'r') as filein:
         users = json.loads(filein)
-    if chat_id in users['op-3']:
-        return [3, ]
-    return result;
+    for op_level in users:
+        if chat_id in users[op_level]:
+            return [int(op_level[3]), users[op_level][chat_id]]
+    return [0, 0]
 
-time.time()
+def update_user_op(chat_id, oldop, newop):
+    with open((directory_path() + 'allowed_users.json'), 'r') as filein:
+        users = json.loads(filein)
+    users[('op-' + str(newop))][chat_id] = users[('op-' + str(oldop))][chat_id]
+    users[('op-' + str(oldop))].pop(chat_id)
+    fout = open((directory_path() + 'allowed_users.json'), 'w')
+    fout.write(json.dumps(users))
+    fout.close()
+
+
+def update_user_status(chat_id, op, newstatus):
+    with open((directory_path() + 'allowed_users.json'), 'r') as filein:
+        users = json.loads(filein)
+    users[('op-' + str(op))][chat_id] = newstatus
+    fout = open((directory_path() + 'allowed_users.json'), 'w')
+    fout.write(json.dumps(users))
+    fout.close()

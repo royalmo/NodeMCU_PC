@@ -8,9 +8,9 @@ This file will check every five minutes if PC state has changed. If so, logs wil
 '''
 
 if __name__ == '__main__':
-    updatepc()
+    updatepc(False)
 
-def updatepc(from_bot = False):
+def updatepc(from_bot = True):
     with open((directory_path() + 'logs_info.log'), 'r') as filein:
         loginfo = json.loads(filein)
     with open((directory_path() + loginfo['status-actual']), 'r') as filein:
