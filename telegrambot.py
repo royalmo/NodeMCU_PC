@@ -76,7 +76,7 @@ def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
         if data[0] == 1 and data[1] == 0:
             bot.sendMessage(chat_id, 'A sus ordenes, mi capitan.')
             delay(10)
-            if wget_mcu('/shutdown')[0] == 'D':
+            if wget_mcu('/shutdown', True)[0] == 'D':
                 bot.sendMessage(chat_id, 'Se a cumplido la mision con sumo exito.')
             else:
                 bot.sendMessage(chat_id, 'Lo siento jefe, pero nos han hackeado la mision...')
@@ -86,7 +86,7 @@ def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
         bot.sendMessage(chat_id, 'A sus ordenes, mi capitan.')
         if data[0] == 0 and data[1] != 2:
             delay(10)
-            if wget_mcu('/start')[0] == 'D':
+            if wget_mcu('/start', True)[0] == 'D':
                 bot.sendMessage(chat_id, 'Se a cumplido la mision con sumo exito.')
             else:
                 bot.sendMessage(chat_id, 'Lo siento jefe, pero nos han hackeado la mision...')
@@ -100,7 +100,7 @@ def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
         bot.sendMessage(chat_id, 'Suficiente, ahora lo hago.')
         if data[0] == 0 and data[1] != 2:
             delay(10)
-            if wget_mcu('/start')[0] == 'D':
+            if wget_mcu('/start', True)[0] == 'D':
                 bot.sendMessage(chat_id, 'Se a cumplido la mision con sumo exito.')
             else:
                 bot.sendMessage(chat_id, 'Lo siento compatriota, pero nos han hackeado la mision...')
@@ -127,14 +127,17 @@ def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
         bot.sendMessage(chat_id, 'Preguntandole al subdito delegado como esta el panorama.')
         mcustatus = wget_mcu('/data')
         if mcustatus[0] == '0':
-            answer = ', you computer was off, and the fan switch state was on position number '
+            answer = ', tu computadora estaba apagada, y la posicion del interruptor del ventilador es la numero '
         else:
-            answer = ', you computer was on, and the fan switch state was on position number '
+            answer = ', tu computadora estaba encendida, y la posicion del interruptor del ventilador es la numero '
         answer = answer + mcustatus[1] + '.'
         timestring = str(datetime.datetime.now())[0:-7].split(' ')
-        bot.sendMessage(chat_id, ('Today, ' + timestring[0] + ' at ' + timestring[1] + answer))
+        bot.sendMessage(chat_id, ('Hoy, ' + timestring[0] + ' a las ' + timestring[1] + answer))
     else:
-        bot.sendMessage(chat_id, 'Lo siento, pero me llamo Osvaldo, no Alexa, y en consecuente no dispongo de infinitas respuestas para tus mierdas.')
+        bot.sendMessage(chat_id, random_answer(message))
+
+def random_answer(message):
+    return 'Lo siento, pero me llamo Osvaldo, no Alexa, y en consecuente no dispongo de infinitas respuestas para tus mierdas.'
 
 def insertonlog(date, chat_id, message):
     with open((directory_path() + 'logs_info.json'), 'r') as filein:
@@ -156,11 +159,11 @@ def insertonlog(date, chat_id, message):
         with open((directory_path() + newfile), 'w') as filein:
             filein.write(result)
 
-def wget_mcu(extension): #This function returns the content of a webpage (and does included actions).
+def wget_mcu(extension, update = False): #This function returns the content of a webpage (and does included actions).
     global node_mcu_ip
     result = get(node_mcu_ip + extension).content
     time.sleep(10)
-    if extension != '/status' or extension != '/data':
+    if update:
         updatepc()
     return result
 
@@ -199,7 +202,7 @@ def add_user(chat_id, op):
     fout.close()
 
 def updatepc(from_bot = True):
-    with open((directory_path() + 'logs_info.log'), 'r') as filein:
+    with open((directory_path() + 'logs_info.json'), 'r') as filein:
         loginfo = json.loads(filein.read())
     with open((directory_path() + loginfo['status-actual']), 'r') as filein:
         filein = filein.read().split('\n')

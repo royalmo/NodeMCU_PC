@@ -11,7 +11,7 @@ if __name__ == '__main__':
     updatepc(False)
 
 def updatepc(from_bot = True):
-    with open((directory_path() + 'logs_info.log'), 'r') as filein:
+    with open((directory_path() + 'logs_info.json'), 'r') as filein:
         loginfo = json.loads(filein.read())
     with open((directory_path() + loginfo['status-actual']), 'r') as filein:
         filein = filein.read().split('\n')
