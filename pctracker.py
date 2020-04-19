@@ -17,7 +17,7 @@ def updatepc(from_bot = True):
         filein = filein.split('\n')
         lines = len(filein)
         latest = filein[lines - 1]
-    result = '>>> ' + wget_mcu('/status')
+    result = '>>> ' + wget_mcu('/status')[0:-1]
     if not(result in latest): #UPDATES LOG FILE IF NECESSARY
         if from_bot:
             result+= '[Requested by Telegram bot]'
