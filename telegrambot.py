@@ -28,8 +28,6 @@ QUICK NOTE: Messages will be in spanish, because of an intern joke, so you are f
 
 global node_mcu_ip = 'http://192.168.1.99' #INSERT NODEMCU STATIC IP
 global bot = telepot.Bot('*** INSERT TOKEN ***') #INSERT YOUR TELEGRAM BOT TOKEN
-global login_key = '****' #INSERT PASSWORD TO LOGIN
-global action_key = '****' #INSERT PASSWORD TO GET STATUS WHEN LOGOUT OR TO START PC WHEN LOGIN
 
 def directory_path():  #CHANGE DIRECTORY PATH IF NEEDED
     return '/home/pi/NodeMCU_PC/'
@@ -49,23 +47,80 @@ def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
     user_info = get_user_info(chat_id)
     op = user_info[0]
     status = user_info[1]
-
-
+    if op == 0:
+        bot.sendMessage(chat_id, "¡Ostias! Hacia tiempo que no te veía, de hecho, nunca te he visto por aquí...")
+        add_user(chat_id, 1)
+        op = 1
     if message == '/start' or 'teniente' in message:
-        bot.sendMessage(chat_id, "Muy buenas, ¿con quién estoy hablando?")
-
-    elif 'panorama' in message:
+        if op == 1:
+            bot.sendMessage(chat_id, "Muy buenas, mísero soldado.")
+        elif op == 2:
+            bot.sendMessage(chat_id, "Muy buenas, compatriota.")
+        else:
+            bot.sendMessage(chat_id, "Muy buenas, mi capitán. ¿Qué buen viento le trae aquí?")
+    elif message == '/help' or 'aiuda' in message:
+        bot.sendMessage(chat_id, "Aver, ¿cómo quieres que te ayuda desde una PC pocha? Ya eres suficientemente grande para pensar solito.")
+    elif message == '/stop' or 'descenso' in message:
+        if op == 1:
+            bot.sendMessage(chat_id, "Lo siento, pero no puedo descenderte más de lo que ya estás, no quiero que te vayas con Julen :)")
+        elif op == 2:
+            bot.sendMessage(chat_id, "Bueno, para descenderte no te lo voy a pedir dos veces, tampoco soy gilipollas... ahora eres un soldado de nuevo.")
+            update_user_op(chat_id, 2, 1)
+        else:
+            bot.sendMessage(chat_id, "Lo siento mi señor, pero no tengo los huevos suficientemente grandes para descenderte...")
+    elif 'ascenso' in message:
+        if op == 2:
+            bot.sendMessage(chat_id, "Lo siento, pero no puedes ascender más, bienvenido a la hipocresia, my friend :)")
+        elif op == 1:
+            bot.sendMessage(chat_id, "Bueno, no te voy a ascender tan facilmente, dame por lo menos una razón valida.")
+            update_user_status(chat_id, 1, 1)
+        else:
+            bot.sendMessage(chat_id, "Lo siento mi señor, pero no te puedo subir más arriba que España...")
+    elif 'aralo todo' in message and op == 3:
+        data = wget_mcu('/data')
+        if data[0] == 1 and data[1] == 0:
+            bot.sendMessage(chat_id, "A sus órdenes, mi capitán.")
+            delay(10)
+            if wget_mcu('/shutdown')[0] == 'D':
+                bot.sendMessage(chat_id, "Se a cumplido la misión con sumo éxito.")
+            else:
+                bot.sendMessage(chat_id, "Lo siento jefe, pero nos han hackeado la misión...")
+        bot.sendMessage(chat_id, "Lo siento jefe, pero nos han hackeado la misión...")
+    elif 'jecuta' in message and op == 3:
+        data = wget_mcu('/data')
+        bot.sendMessage(chat_id, "A sus órdenes, mi capitán.")
+        if data[0] == 0 and data[1] != 2:
+            delay(10)
+            if wget_mcu('/start')[0] == 'D':
+                bot.sendMessage(chat_id, "Se a cumplido la misión con sumo éxito.")
+            else:
+                bot.sendMessage(chat_id, "Lo siento jefe, pero nos han hackeado la misión...")
+        bot.sendMessage(chat_id, "Lo siento jefe, pero nos han hackeado la misión...")
+    elif 'jecuta' in message and op == 2:
+        bot.sendMessage(chat_id, "Aver, vale que seas mi compatriota, pero no lo voy a hacer sin un jamon 5J.")
+        update_user_status(chat_id, 2, 2)
+    elif 'bruh' in message and op == 2 and status == 2:
+        update_user_status(chat_id, 2, 0)
+        data = wget_mcu('/data')
+        bot.sendMessage(chat_id, "Suficiente, ahora lo hago.")
+        if data[0] == 0 and data[1] != 2:
+            delay(10)
+            if wget_mcu('/start')[0] == 'D':
+                bot.sendMessage(chat_id, "Se a cumplido la misión con sumo éxito.")
+            else:
+                bot.sendMessage(chat_id, "Lo siento compatriota, pero nos han hackeado la misión...")
+        bot.sendMessage(chat_id, "Lo siento compatriota, pero nos han hackeado la misión...")
+    elif 'panorama' in message and op != 1:
+        bot.sendMessage(chat_id, "Preguntándole al súbdito delegado cómo está el panorama.")
         bot.sendMessage(chat_id, str(datetime.datetime.now()))
 
-    update_user_op(chat_id, oldop, newop)
-    update_user_status(chat_id, op, newstatus)
-    wget_mcu('/start') # /status /data /shutdown
-
-#public commands: /start /stop /help
-#private keywords: panorama ascenso ejecuta paralo todo
-
-#END MAIN FUNCTION
-
+    elif 'panorama' in message and op == 1:
+        bot.sendMessage(chat_id, "Dame una razón para que te pueda dar datos de la alta nobleza.")
+        update_user_status(chat_id, 1, 2)
+    elif 'bruh' in message and op == 1 and status == 1:
+    elif 'bruh' in message and op == 1 and status == 2:
+    else:
+        bot.sendMessage(chat_id, "Lo siento, pero me llamo Osvaldo, no Alexa, y en consecuente no dispongo de infinitas respuestas para tus mierdas.")
 
 def insertonlog(date, chat_id, message):
     with open((directory_path() + 'logs_info.log'), 'r') as filein:
@@ -117,6 +172,14 @@ def update_user_status(chat_id, op, newstatus):
     with open((directory_path() + 'allowed_users.json'), 'r') as filein:
         users = json.loads(filein)
     users[('op-' + str(op))][chat_id] = newstatus
+    fout = open((directory_path() + 'allowed_users.json'), 'w')
+    fout.write(json.dumps(users))
+    fout.close()
+
+def add_user(chat_id, op):
+    with open((directory_path() + 'allowed_users.json'), 'r') as filein:
+        users = json.loads(filein)
+    users[('op-' + str(op))][chat_id] = 0
     fout = open((directory_path() + 'allowed_users.json'), 'w')
     fout.write(json.dumps(users))
     fout.close()
