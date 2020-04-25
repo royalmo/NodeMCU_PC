@@ -33,10 +33,13 @@ def directory_path():  #CHANGE DIRECTORY PATH IF NEEDED
     #return '/home/pi/NodeMCU_PC/'
     return ''
 
+def get_unicode(s):
+    return unicode(s, errors = 'replace')
+
 def handle(msg): #THIS FUNCTION EXECUTES WHEN MESSAGE RECEIVED.
     global bot
     chat_id = msg['chat']['id']
-    message = msg['text'].replace('\n', ' |n ')
+    message = get_unicode(msg['text']).replace('\n', ' |n ')
     date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(msg['date']))
     insertonlog(date, chat_id, message) #SEND MESSAGE TO LOGS
     user_info = get_user_info(chat_id)
