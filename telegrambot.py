@@ -3,7 +3,7 @@
 
 from time import strftime, localtime, sleep, time
 from random import randint
-from datetime.datetime import now
+from datetime import datetime
 import telepot
 from telepot.loop import MessageLoop
 from requests import get
@@ -122,7 +122,7 @@ def does_it_contain(message, command_code):
 def send_status():
     global json_answers
     mcustatus = wget_mcu("/data")
-    timestring = str(now())[0:-7].split(" ")
+    timestring = str(datetime.now())[0:-7].split(" ")
     msg_list = json_answers["pcstatus-answer-protocol"]
     answer = msg_list[0] + timestring[0] + msg_list[1] + timestring[1] + msg_list[2] + msg_list[int(mcustatus[0]) + 3]
     return (answer + msg_list[5] + mcustatus[1] + msg_list[int(mcustatus[1]) + 6])
@@ -226,7 +226,7 @@ def updatepc(from_bot = True):
             result+= "[Requested by Telegram bot]"
         if lines < 100:
             with open((directory_path + loginfo["status-actual"]), "a") as filein:
-                filein.write("\n" + str(now()) + result)
+                filein.write("\n" + str(datetime.now()) + result)
         else: #IF LOG FILE IS FULL (+100 lines) IT CREATES ANOTHER
             newlog = loginfo
             newlog["status-saved"][loginfo["status-actual"]] = time()
@@ -236,7 +236,7 @@ def updatepc(from_bot = True):
             fout.write(dumps(newlog))
             fout.close()
             with open((directory_path + newfile), "w") as filein:
-                filein.write(str(now()) + result)
+                filein.write(str(datetime.now()) + result)
 
 if __name__ == "__main__":
     global bot
