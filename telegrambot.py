@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import time
 from random import randint
 import datetime
@@ -35,6 +37,7 @@ def load_configs():
     global directory_path
     global nodemcu_ip
     global msg_path
+    global messages
     directory_path = getcwd() + "/"
     with open((directory_path + "config.json"), "r") as filein:
         configlog = json.loads(filein.read())
@@ -46,19 +49,24 @@ def load_configs():
         nodemcu_ip += ":" + str(configlog["nodemcu-port"])
     bot = telepot.Bot(configlog["telegram-token"])
     msg_path = directory_path + "lang-" + configlog["main-language"] + ".json"
+    with open(msg_path, "r") as filein:
+        messages = json.loads(filein.read())
 
 def get_msg(msg_code, is_list = False, list_element = -1):
-    global msg_path
-    with open(msg_path, "r") as filein:
-        output = json.loads(filein.read())[msg_code]
-    if not(is_list):
-        return unicode(output, errors = "replace")
-    if list_element != -1:
-        return unicode(output[list_element], errors = "replace")
-    result = []
-    for element in output:
-        result.append(unicode(element, errors = "replace"))
-    return result
+    global messages
+    output = messages[msg_code]
+    if list_element == -1:
+        return output
+    else:
+        return output[list_element]
+    # if not(is_list):
+    #     return unicode(output, errors = "replace")
+    # if list_element != -1:
+    #     return unicode(output[list_element], errors = "replace")
+    # result = []
+    # for element in output:
+    #     result.append(unicode(element, errors = "replace"))
+    # return result
 
 
 def handle(msg):
