@@ -81,7 +81,7 @@ def handle(msg):
     elif "aralo todo" in message and op == 3:
         bot.sendMessage(chat_id, json_answers["pcstop-op3-received"])
         data = wget_mcu("/data")
-        delay(10)
+        time.sleep(10)
         if data[0] == 1 and data[1] == 0 and wget_mcu("/shutdown", True)[0] == "D":
             bot.sendMessage(chat_id, json_answers["pcstop-op3-success"])
         else:
@@ -89,7 +89,7 @@ def handle(msg):
     elif "jecuta" in message and op == 3:
         bot.sendMessage(chat_id, json_answers["pcstart-op3-received"])
         data = wget_mcu("/data")
-        delay(10)
+        time.sleep(10)
         if data[0] == 0 and data[1] != 2 and wget_mcu("/start", True)[0] == "D":
             bot.sendMessage(chat_id, json_answers["pcstart-op3-success"])
         else:
@@ -101,7 +101,7 @@ def handle(msg):
         bot.sendMessage(chat_id, json_answers["pcstart-op2-pwd-done"])
         update_user_status(chat_id, 2, 0)
         data = wget_mcu("/data")
-        delay(10)
+        time.sleep(10)
         if data[0] == 0 and data[1] != 2 and wget_mcu("/start", True)[0] == "D":
             bot.sendMessage(chat_id, json_answers["pcstart-op2-success"])
         else:
@@ -157,7 +157,7 @@ def insertonlog(date, chat_id, message):
 
 def wget_mcu(extension, update = False): #This function returns the content of a webpage (and does included actions).
     global nodemcu_ip
-    result = get(nodemcu_ip + extension).content
+    result = get(nodemcu_ip + extension).content.decode("utf-8")
     time.sleep(10)
     if update:
         updatepc()
