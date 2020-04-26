@@ -43,7 +43,7 @@ def load_configs():
         nodemcu_ip += str(element) + "."
     nodemcu_ip = nodemcu_ip[0:-1]
     if configlog["nodemcu-port"] != 80:
-        nodemcu_ip += ":" str(configlog["nodemcu-port"])
+        nodemcu_ip += ":" + str(configlog["nodemcu-port"])
     bot = telepot.Bot(configlog["telegram-token"])
     msg_path = directory_path + "/lang-" + configlog["main-language"] + ".json"
 
@@ -64,7 +64,7 @@ def get_msg(msg_code, is_list = False, list_element = -1):
 def handle(msg):
     global bot
     chat_id = msg["chat"]["id"]
-    message = unicode(msg["text"], errors = "replace").replace("\n", " |n ")
+    message = msg["text"].replace("\n", " |n ")
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(msg["date"]))
     insertonlog(date, chat_id, message)
     user_info = get_user_info(chat_id)
@@ -163,15 +163,16 @@ def insertonlog(date, chat_id, message):
             filein.write(result)
 
 def wget_mcu(extension, update = False): #This function returns the content of a webpage (and does included actions).
-    global node_mcu_ip
-    result = get(node_mcu_ip + extension).content
+    global nodemcu_ip
+    result = get(nodemcu_ip + extension).content
     time.sleep(10)
     if update:
         updatepc()
     return result
 
 def get_user_info(chat_id): #This function returns op level of user, and previous status.
-    with open((directory_path() + "allowed_users.json"), "r") as filein:
+    global directory_path
+    with open((directory_path + "allowed_users.json"), "r") as filein:
         users = json.loads(filein.read())
     for op_level in users:
         if str(chat_id) in users[op_level]:
@@ -179,35 +180,39 @@ def get_user_info(chat_id): #This function returns op level of user, and previou
     return [0, 0]
 
 def update_user_op(chat_id, oldop, newop):
-    with open((directory_path() + "allowed_users.json"), "r") as filein:
+    global directory_path
+    with open((directory_path + "allowed_users.json"), "r") as filein:
         users = json.loads(filein.read())
     users[("op-" + str(newop))][str(chat_id)] = users[("op-" + str(oldop))][str(chat_id)]
     users[("op-" + str(oldop))].pop(str(chat_id))
-    fout = open((directory_path() + "allowed_users.json"), "w")
+    fout = open((directory_path + "allowed_users.json"), "w")
     fout.write(json.dumps(users))
     fout.close()
 
 
 def update_user_status(chat_id, op, newstatus):
-    with open((directory_path() + "allowed_users.json"), "r") as filein:
+    global directory_path
+    with open((directory_path + "allowed_users.json"), "r") as filein:
         users = json.loads(filein.read())
     users[("op-" + str(op))][str(chat_id)] = newstatus
-    fout = open((directory_path() + "allowed_users.json"), "w")
+    fout = open((directory_path + "allowed_users.json"), "w")
     fout.write(json.dumps(users))
     fout.close()
 
 def add_user(chat_id, op):
-    with open((directory_path() + "allowed_users.json"), "r") as filein:
+    global directory_path
+    with open((directory_path + "allowed_users.json"), "r") as filein:
         users = json.loads(filein.read())
     users[("op-" + str(op))][str(chat_id)] = 0
-    fout = open((directory_path() + "allowed_users.json"), "w")
+    fout = open((directory_path + "allowed_users.json"), "w")
     fout.write(json.dumps(users))
     fout.close()
 
 def updatepc(from_bot = True):
-    with open((directory_path() + "logs_info.json"), "r") as filein:
+    global directory_path
+    with open((directory_path + "logs_info.json"), "r") as filein:
         loginfo = json.loads(filein.read())
-    with open((directory_path() + loginfo["status-actual"]), "r") as filein:
+    with open((directory_path + loginfo["status-actual"]), "r") as filein:
         filein = filein.read().split("\n")
         lines = len(filein)
         latest = filein[lines - 1]
@@ -216,20 +221,22 @@ def updatepc(from_bot = True):
         if from_bot:
             result+= "[Requested by Telegram bot]"
         if lines < 100:
-            with open((directory_path() + loginfo["status-actual"]), "a") as filein:
+            with open((directory_path + loginfo["status-actual"]), "a") as filein:
                 filein.write("\n" + str(datetime.datetime.now()) + result)
         else: #IF LOG FILE IS FULL (+100 lines) IT CREATES ANOTHER
             newlog = loginfo
             newlog["status-saved"][loginfo["status-actual"]] = time.time()
             newfile = "logs/status/" + str(int(time.time())) + ".log"
             newlog["status-actual"] = newfile
-            fout = open((directory_path() +"logs_info.json"), "w")
+            fout = open((directory_path +"logs_info.json"), "w")
             fout.write(json.dumps(newlog))
             fout.close()
-            with open((directory_path() + newfile), "w") as filein:
+            with open((directory_path + newfile), "w") as filein:
                 filein.write(str(datetime.datetime.now()) + result)
 
 if __name__ == "__main__":
+    global bot
+    load_configs()
     MessageLoop(bot, handle).run_as_thread()
     while 1:
         time.sleep(10)
