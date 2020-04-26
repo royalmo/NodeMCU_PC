@@ -50,7 +50,9 @@ def load_configs():
     bot = telepot.Bot(configlog["telegram-token"])
     msg_path = directory_path + "lang-" + configlog["main-language"] + ".json"
     with open(msg_path, "r") as filein:
-        json_answers = json.loads(filein.read())
+        json_file = json.loads(filein.read())
+        json_answers = json_file["answers"]
+        json_commands = json_file["commands"]
 
 def handle(msg):
     global bot
@@ -59,78 +61,83 @@ def handle(msg):
     message = msg["text"].replace("\n", " |n ")
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(msg["date"]))
     insertonlog(date, chat_id, message)
-    user_info = get_user_info(chat_id)
-    op = user_info[0]
-    status = user_info[1]
-    if op == 0:
+    op, status = get_user_info(chat_id)
+    if op == 0: #NEW USER
         bot.sendMessage(chat_id, json_answers["first-time-msg"])
         add_user(chat_id, 1)
-        op = 1
-    if message == "/start" or "teniente" in message:
+        bot.sendMessage(chat_id, json_answers["hello-op1"])
+    elif does_it_contain(message, "hello-cmds"):
         bot.sendMessage(chat_id, json_answers["hello-op" + str(op)])
-    elif message == "/help" or "aiuda" in message:
+    elif does_it_contain(message, "help-cmds"):
         bot.sendMessage(chat_id, json_answers["help-msg"])
-    elif message == "/stop" or "descenso" in message:
-        bot.sendMessage(chat_id, json_answers["logout-op" + str(op)])
-        if op == 2:
-            update_user_op(chat_id, 2, 1)
-    elif "ascenso" in message:
+    elif does_it_contain(message, "login-cmds"):
         bot.sendMessage(chat_id, json_answers["login-op" + str(op)])
         if op == 1:
             update_user_status(chat_id, 1, 1)
-    elif "aralo todo" in message and op == 3:
-        bot.sendMessage(chat_id, json_answers["pcstop-op3-received"])
-        data = wget_mcu("/data")
-        time.sleep(10)
-        if data[0] == 1 and data[1] == 0 and wget_mcu("/shutdown", True)[0] == "D":
-            bot.sendMessage(chat_id, json_answers["pcstop-op3-success"])
-        else:
-            bot.sendMessage(chat_id, json_answers["pcstop-op3-fail"])
-    elif "jecuta" in message and op == 3:
-        bot.sendMessage(chat_id, json_answers["pcstart-op3-received"])
-        data = wget_mcu("/data")
-        time.sleep(10)
-        if data[0] == 0 and data[1] != 2 and wget_mcu("/start", True)[0] == "D":
-            bot.sendMessage(chat_id, json_answers["pcstart-op3-success"])
-        else:
-            bot.sendMessage(chat_id, json_answers["pcstart-op3-fail"])
-    elif "jecuta" in message and op == 2:
-        bot.sendMessage(chat_id, json_answers["pcstart-op2-pwd-ask"])
-        update_user_status(chat_id, 2, 2)
-    elif "bruh" in message and op == 2 and status == 2:
-        bot.sendMessage(chat_id, json_answers["pcstart-op2-pwd-done"])
-        update_user_status(chat_id, 2, 0)
-        data = wget_mcu("/data")
-        time.sleep(10)
-        if data[0] == 0 and data[1] != 2 and wget_mcu("/start", True)[0] == "D":
-            bot.sendMessage(chat_id, json_answers["pcstart-op2-success"])
-        else:
-            bot.sendMessage(chat_id, json_answers["pcstart-op2-fail"])
-    elif "panorama" in message and op != 1:
+    elif does_it_contain(message, "logout-cmds"):
+        bot.sendMessage(chat_id, json_answers["logout-op" + str(op)])
+        if op == 2:
+            update_user_op(chat_id, 2, 1)
+    elif does_it_contain(message, "pcstatus-cmds"):
         bot.sendMessage(chat_id, json_answers["pcstatus-op" + str(op) + "-received"])
-        mcustatus = wget_mcu("/data")
-        timestring = str(datetime.now())[0:-7].split(" ")
-        msg_list = json_answers["pcstatus-answer-protocol"]
-        answer = msg_list[0] + timestring[0] + msg_list[1] + timestring[1] + msg_list[2] + msg_list[int(mcustatus[0]) + 3]
-        bot.sendMessage(chat_id, (answer + msg_list[5] + mcustatus[1] + msg_list[int(mcustatus[1]) + 6]))
-    elif "panorama" in message and op == 1:
-        bot.sendMessage(chat_id, json_answers["pcstatus-op1-pwd-ask"])
-        update_user_status(chat_id, 1, 2)
-    elif "eyeyey" in message and op == 1 and status == 1:
+        if op != 1:
+            bot.sendMessage(chat_id, send_status())
+        else:
+            update_user_status(chat_id, 1, 2)
+    elif does_it_contain(message, "pcstart-cmds") and op != 1:
+        bot.sendMessage(chat_id, json_answers["pcstart-op" + str(op) + "-received"])
+        if op == 3:
+            bot.sendMessage(chat_id, json_answers[action_pc("start", op)])
+        else:
+            update_user_status(chat_id, 2, 2)
+    elif does_it_contain(message, "pcshutdown-cmds") and op == 3:
+        bot.sendMessage(chat_id, json_answers["pcshutdown-op3-received"])
+        bot.sendMessage(chat_id, json_answers[action_pc()])
+    elif does_it_contain(message, "login-pwds") and op == 1 and status == 1:
         update_user_op(chat_id, 1, 2)
         update_user_status(chat_id, 2, 0)
         bot.sendMessage(chat_id, json_answers["login-op1-pwd-done"])
-    elif "bitcoin" in message and op == 1 and status == 2:
+    elif does_it_contain(message, "pcstatus-pwds") and op == 1 and status == 2:
         bot.sendMessage(chat_id, json_answers["pcstatus-op1-pwd-done"])
-        mcustatus = wget_mcu("/data")
-        timestring = str(datetime.now())[0:-7].split(" ")
-        msg_list = json_answers["pcstatus-answer-protocol"]
-        answer = msg_list[0] + timestring[0] + msg_list[1] + timestring[1] + msg_list[2] + msg_list[int(mcustatus[0]) + 3]
-        bot.sendMessage(chat_id, (answer + msg_list[5] + mcustatus[1] + msg_list[int(mcustatus[1]) + 6]))
+        bot.sendMessage(chat_id, send_status())
+    elif does_it_contain(message, "pcstart-pwds") and op == 2 and status == 2:
+        bot.sendMessage(chat_id, json_answers["pcstart-op2-pwd-done"])
+        update_user_status(chat_id, 2, 0)
+        bot.sendMessage(chat_id, json_answers[action_pc("start", op)])
     else:
-        bot.sendMessage(chat_id, random_answer(message))
+        bot.sendMessage(chat_id, random_answer())
 
-def random_answer(message):
+def does_it_contain(message, command_code):
+    global json_commands
+    keywords = json_commands[command_code]
+    for key in keywords:
+        if key in message:
+            return True
+    return False
+
+def send_status():
+    global json_answers
+    mcustatus = wget_mcu("/data")
+    timestring = str(datetime.now())[0:-7].split(" ")
+    msg_list = json_answers["pcstatus-answer-protocol"]
+    answer = msg_list[0] + timestring[0] + msg_list[1] + timestring[1] + msg_list[2] + msg_list[int(mcustatus[0]) + 3]
+    return (answer + msg_list[5] + mcustatus[1] + msg_list[int(mcustatus[1]) + 6])
+
+def action_pc(action = "shutdown", op = 3):
+    data = wget_mcu("/data")
+    time.sleep(10)
+    msg_code = "pc" + action + "-op" + str(op)
+    if data[0] == 1 and data[1] == 0:
+        result = wget_mcu(("/" + action), True)
+        if result[0] == "D":
+            return (msg_code + "-success")
+        else:
+            return (msg_code + "-fail")
+    else:
+        return (msg_code + "-fail-denied")
+
+def random_answer():
+    global json_answers
     randoms = json_answers["else-messages"]
     return randoms[randint(0, len(randoms)-1)]
 
