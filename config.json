@@ -2,7 +2,6 @@
   "raspberry-ip": [192, 168, 1, 20],
   "nodemcu-ip": [192, 168, 1, 19],
   "telegram-token": "dasdfuhgiasdflkjhasd",
-  "raspberry-path": "/home/pi/NodeMCU_PC/",
   "wifi-ssid": "asdfbhkjlasd",
   "wifi-pwd": "ljkhgfdkjlfdsg",
   "main-language": "es",
