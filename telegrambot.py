@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import time
-import random
+from random import randint
 import datetime
 import telepot
 from telepot.loop import MessageLoop
@@ -30,7 +30,11 @@ REQUEST STATUS:
 - 2: Asked action, waiting for password.
 """
 
-def load_configs()
+def load_configs():
+    global bot
+    global directory_path
+    global nodemcu_ip
+    global msg_path
     directory_path = getcwd()
     with open((directory_path + "/config.json"), "r") as filein:
         configlog = json.loads(filein.read())
@@ -43,114 +47,100 @@ def load_configs()
     bot = telepot.Bot(configlog["telegram-token"])
     msg_path = directory_path + "/lang-" + configlog["main-language"] + ".json"
 
-def get_unicode_text(s):
-    return unicode(s, errors = "replace")
+def get_msg(msg_code, is_list = False, list_element = -1):
+    global msg_path
+    with open(msg_path, "r") as filein:
+        output = json.loads(filein.read())[msg_code]
+    if not(is_list):
+        return unicode(output, errors = "replace")
+    if list_element != -1:
+        return unicode(output[list_element], errors = "replace")
+    result = []
+    for element in output:
+        result.append(unicode(element, errors = "replace"))
+    return result
+
 
 def handle(msg):
     global bot
     chat_id = msg["chat"]["id"]
-    message = get_unicode(msg["text"]).replace("\n", " |n ")
+    message = unicode(msg["text"], errors = "replace").replace("\n", " |n ")
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(msg["date"]))
-    insertonlog(date, chat_id, message) #SEND MESSAGE TO LOGS
+    insertonlog(date, chat_id, message)
     user_info = get_user_info(chat_id)
     op = user_info[0]
     status = user_info[1]
     if op == 0:
-        bot.sendMessage(chat_id, "Ostias! Hacia tiempo que no te veia, de hecho, nunca te he visto por aqui...")
+        bot.sendMessage(chat_id, get_msg("first-time-msg"))
         add_user(chat_id, 1)
         op = 1
     if message == "/start" or "teniente" in message:
-        if op == 1:
-            bot.sendMessage(chat_id, "Muy buenas, misero soldado.")
-        elif op == 2:
-            bot.sendMessage(chat_id, "Muy buenas, compatriota.")
-        else:
-            bot.sendMessage(chat_id, "Muy buenas, mi capitan. Que buen viento le trae aqui?")
+        bot.sendMessage(chat_id, get_msg("hello-op" + str(op)))
     elif message == "/help" or "aiuda" in message:
-        bot.sendMessage(chat_id, "Aver, como quieres que te ayuda desde una PC pocha? Ya eres suficientemente grande para pensar solito.")
+        bot.sendMessage(chat_id, get_msg("help-msg"))
     elif message == "/stop" or "descenso" in message:
-        if op == 1:
-            bot.sendMessage(chat_id, "Lo siento, pero no puedo descenderte mas de lo que ya estas, no quiero que te vayas con Julen :)")
-        elif op == 2:
-            bot.sendMessage(chat_id, "Bueno, para descenderte no te lo voy a pedir dos veces, tampoco soy gilipollas... ahora eres un soldado de nuevo.")
-            update_user_op(chat_id, 2, 1)
-        else:
-            bot.sendMessage(chat_id, "Lo siento mi sen*or, pero no tengo los huevos suficientemente grandes para descenderte...")
-    elif "ascenso" in message:
+        bot.sendMessage(chat_id, get_msg("logout-op" + str(op)))
         if op == 2:
-            bot.sendMessage(chat_id, "Lo siento, pero no puedes ascender mas, bienvenido a la hipocresia, my friend :)")
-        elif op == 1:
-            bot.sendMessage(chat_id, "Bueno, no te voy a ascender tan facilmente, dame por lo menos una razon valida.")
+            update_user_op(chat_id, 2, 1)
+    elif "ascenso" in message:
+        bot.sendMessage(chat_id, get_msg("login-op" + str(op)))
+        if op == 1:
             update_user_status(chat_id, 1, 1)
-        else:
-            bot.sendMessage(chat_id, "Lo siento mi sen*or, pero no te puedo subir mas arriba que Espan*a...")
     elif "aralo todo" in message and op == 3:
+        bot.sendMessage(chat_id, get_msg("pcstop-op3-received"))
         data = wget_mcu("/data")
-        if data[0] == 1 and data[1] == 0:
-            bot.sendMessage(chat_id, "A sus ordenes, mi capitan.")
-            delay(10)
-            if wget_mcu("/shutdown", True)[0] == "D":
-                bot.sendMessage(chat_id, "Se a cumplido la mision con sumo exito.")
-            else:
-                bot.sendMessage(chat_id, "Lo siento jefe, pero nos han hackeado la mision...")
-        bot.sendMessage(chat_id, "Lo siento jefe, pero nos han hackeado la mision...")
+        delay(10)
+        if data[0] == 1 and data[1] == 0 and wget_mcu("/shutdown", True)[0] == "D":
+            bot.sendMessage(chat_id, get_msg("pcstop-op3-success"))
+        else:
+            bot.sendMessage(chat_id, get_msg("pcstop-op3-fail"))
     elif "jecuta" in message and op == 3:
+        bot.sendMessage(chat_id, get_msg("pcstart-op3-received"))
         data = wget_mcu("/data")
-        bot.sendMessage(chat_id, "A sus ordenes, mi capitan.")
-        if data[0] == 0 and data[1] != 2:
-            delay(10)
-            if wget_mcu("/start", True)[0] == "D":
-                bot.sendMessage(chat_id, "Se a cumplido la mision con sumo exito.")
-            else:
-                bot.sendMessage(chat_id, "Lo siento jefe, pero nos han hackeado la mision...")
-        bot.sendMessage(chat_id, "Lo siento jefe, pero nos han hackeado la mision...")
+        delay(10)
+        if data[0] == 0 and data[1] != 2 and wget_mcu("/start", True)[0] == "D":
+            bot.sendMessage(chat_id, get_msg("pcstart-op3-success"))
+        else:
+            bot.sendMessage(chat_id, get_msg("pcstart-op3-fail"))
     elif "jecuta" in message and op == 2:
-        bot.sendMessage(chat_id, "Aver, vale que seas mi compatriota, pero no lo voy a hacer sin un jamon 5J.")
+        bot.sendMessage(chat_id, get_msg("pcstart-op2-pwd-ask"))
         update_user_status(chat_id, 2, 2)
     elif "bruh" in message and op == 2 and status == 2:
+        bot.sendMessage(chat_id, get_msg("pcstart-op2-pwd-done"))
         update_user_status(chat_id, 2, 0)
         data = wget_mcu("/data")
-        bot.sendMessage(chat_id, "Suficiente, ahora lo hago.")
-        if data[0] == 0 and data[1] != 2:
-            delay(10)
-            if wget_mcu("/start", True)[0] == "D":
-                bot.sendMessage(chat_id, "Se a cumplido la mision con sumo exito.")
-            else:
-                bot.sendMessage(chat_id, "Lo siento compatriota, pero nos han hackeado la mision...")
-        bot.sendMessage(chat_id, "Lo siento compatriota, pero nos han hackeado la mision...")
-    elif "panorama" in message and op != 1:
-        bot.sendMessage(chat_id, "Preguntandole al subdito delegado como esta el panorama.")
-        mcustatus = wget_mcu("/data")
-        if mcustatus[0] == "0":
-            answer = ", you computer was off, and the fan switch state was on position number "
+        delay(10)
+        if data[0] == 0 and data[1] != 2 and wget_mcu("/start", True)[0] == "D":
+            bot.sendMessage(chat_id, get_msg("pcstart-op2-success"))
         else:
-            answer = ", you computer was on, and the fan switch state was on position number "
-        answer = answer + mcustatus[1] + "."
+            bot.sendMessage(chat_id, get_msg("pcstart-op2-fail"))
+    elif "panorama" in message and op != 1:
+        bot.sendMessage(chat_id, get_msg("pcstatus-op" + str(op) + "-received"))
+        mcustatus = wget_mcu("/data")
         timestring = str(datetime.datetime.now())[0:-7].split(" ")
-        bot.sendMessage(chat_id, ("Today, " + timestring[0] + " at " + timestring[1] + answer))
+        msg_list = get_msg("pcstatus-answer-protocol", True)
+        answer = msg_list[0] + timestring[0] + msg_list[1] + timestring[1] + msg_list[2] + msg_list[int(mcustatus[0]) + 3]
+        bot.sendMessage(chat_id, (answer + msg_list[5] + mcustatus[1] + msg_list[int(mcustatus[1]) + 6]))
     elif "panorama" in message and op == 1:
-        bot.sendMessage(chat_id, "Dame una razon para que te pueda dar datos de la alta nobleza.")
+        bot.sendMessage(chat_id, get_msg("pcstatus-op1-pwd-ask"))
         update_user_status(chat_id, 1, 2)
     elif "eyeyey" in message and op == 1 and status == 1:
         update_user_op(chat_id, 1, 2)
         update_user_status(chat_id, 2, 0)
-        bot.sendMessage(chat_id, "Bueno, veo que te conoces mis bugs. Ascendido, cabron. Ahora eres mi compatriota :)")
+        bot.sendMessage(chat_id, get_msg("login-op1-pwd-done"))
     elif "bitcoin" in message and op == 1 and status == 2:
-        update_user_status(chat_id, 1, 0)
-        bot.sendMessage(chat_id, "Preguntandole al subdito delegado como esta el panorama.")
+        bot.sendMessage(chat_id, get_msg("pcstatus-op1-pwd-done"))
         mcustatus = wget_mcu("/data")
-        if mcustatus[0] == "0":
-            answer = ", tu computadora estaba apagada, y la posicion del interruptor del ventilador es la numero "
-        else:
-            answer = ", tu computadora estaba encendida, y la posicion del interruptor del ventilador es la numero "
-        answer = answer + mcustatus[1] + "."
         timestring = str(datetime.datetime.now())[0:-7].split(" ")
-        bot.sendMessage(chat_id, ("Hoy, " + timestring[0] + " a las " + timestring[1] + answer))
+        msg_list = get_msg("pcstatus-answer-protocol", True)
+        answer = msg_list[0] + timestring[0] + msg_list[1] + timestring[1] + msg_list[2] + msg_list[int(mcustatus[0]) + 3]
+        bot.sendMessage(chat_id, (answer + msg_list[5] + mcustatus[1] + msg_list[int(mcustatus[1]) + 6]))
     else:
         bot.sendMessage(chat_id, random_answer(message))
 
 def random_answer(message):
-    return "Lo siento, pero me llamo Osvaldo, no Alexa, y en consecuente no dispongo de infinitas respuestas para tus mierdas."
+    randoms = get_msg("else-messages", True)
+    return randoms[randint(0, len(randoms))]
 
 def insertonlog(date, chat_id, message):
     with open((directory_path() + "logs_info.json"), "r") as filein:
