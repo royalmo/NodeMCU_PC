@@ -3,7 +3,7 @@
 
 import time
 from random import randint
-import datetime
+from datetime import datetime
 import telepot
 from telepot.loop import MessageLoop
 from requests import get
@@ -69,7 +69,7 @@ def handle(msg):
     if message == "/start" or "teniente" in message:
         bot.sendMessage(chat_id, json_answers["hello-op" + str(op)])
     elif message == "/help" or "aiuda" in message:
-        bot.sendMessage(chat_id, json_answers["help-msg"))
+        bot.sendMessage(chat_id, json_answers["help-msg"])
     elif message == "/stop" or "descenso" in message:
         bot.sendMessage(chat_id, json_answers["logout-op" + str(op)])
         if op == 2:
@@ -109,7 +109,7 @@ def handle(msg):
     elif "panorama" in message and op != 1:
         bot.sendMessage(chat_id, json_answers["pcstatus-op" + str(op) + "-received"])
         mcustatus = wget_mcu("/data")
-        timestring = str(datetime.datetime.now())[0:-7].split(" ")
+        timestring = str(datetime.now())[0:-7].split(" ")
         msg_list = json_answers["pcstatus-answer-protocol"]
         answer = msg_list[0] + timestring[0] + msg_list[1] + timestring[1] + msg_list[2] + msg_list[int(mcustatus[0]) + 3]
         bot.sendMessage(chat_id, (answer + msg_list[5] + mcustatus[1] + msg_list[int(mcustatus[1]) + 6]))
@@ -123,7 +123,7 @@ def handle(msg):
     elif "bitcoin" in message and op == 1 and status == 2:
         bot.sendMessage(chat_id, json_answers["pcstatus-op1-pwd-done"])
         mcustatus = wget_mcu("/data")
-        timestring = str(datetime.datetime.now())[0:-7].split(" ")
+        timestring = str(datetime.now())[0:-7].split(" ")
         msg_list = json_answers["pcstatus-answer-protocol"]
         answer = msg_list[0] + timestring[0] + msg_list[1] + timestring[1] + msg_list[2] + msg_list[int(mcustatus[0]) + 3]
         bot.sendMessage(chat_id, (answer + msg_list[5] + mcustatus[1] + msg_list[int(mcustatus[1]) + 6]))
@@ -132,7 +132,7 @@ def handle(msg):
 
 def random_answer(message):
     randoms = json_answers["else-messages"]
-    return randoms[randint(0, len(randoms))]
+    return randoms[randint(0, len(randoms)-1)]
 
 def insertonlog(date, chat_id, message):
     global directory_path
@@ -215,7 +215,7 @@ def updatepc(from_bot = True):
             result+= "[Requested by Telegram bot]"
         if lines < 100:
             with open((directory_path + loginfo["status-actual"]), "a") as filein:
-                filein.write("\n" + str(datetime.datetime.now()) + result)
+                filein.write("\n" + str(datetime.now()) + result)
         else: #IF LOG FILE IS FULL (+100 lines) IT CREATES ANOTHER
             newlog = loginfo
             newlog["status-saved"][loginfo["status-actual"]] = time.time()
@@ -225,7 +225,7 @@ def updatepc(from_bot = True):
             fout.write(json.dumps(newlog))
             fout.close()
             with open((directory_path + newfile), "w") as filein:
-                filein.write(str(datetime.datetime.now()) + result)
+                filein.write(str(datetime.now()) + result)
 
 if __name__ == "__main__":
     global bot
