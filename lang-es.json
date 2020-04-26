@@ -1,6 +1,6 @@
 {
-  {"answers":
-    {
+  "answers":
+  {
     "first-time-msg": "Ostias! Hac\u00eda tiempo que no te ve\u00eda, de hecho, nunca te he visto por aqu\u00ed...",
     "help-msg": "Aver, ¿c\u00f3mo quieres que te ayuda desde una PC pocha? Ya eres suficientemente grande para pensar solito.",
     "hello-op3": "¿Muy buenas, mi capit\u00e1n. Que bu\u00e9n viento le trae aqu\u00ed?",
@@ -36,10 +36,10 @@
     "pwd-failed": "Tonto quien lo lea, AAHAHAHAHAHAH TOMA INDIRECTA PRINGAO QUE NO TE SABES NI LAS CONTRAS.",
     "else-messages": ["Lo siento, pero me llamo Osvaldo, no Alexa, y en consecuente no dispongo de infinitas respuestas para tus mierdas.",
       "Mira que eres pesado, que he dicho que no quiero una licuadora...",
-      "Soy de los que piensan que 1 es igual a 2.", "Me comentan por el pinganillo que los porros te suben muy r\u00e1pido, amigo."],
-    }
-  {"commands":
-    {
+      "Soy de los que piensan que 1 es igual a 2.", "Me comentan por el pinganillo que los porros te suben muy r\u00e1pido, amigo."]
+  },
+  "commands":
+  {
     "hello-cmds": ["/start", "teniente"],
     "help-cmds": ["/help", "aiuda"],
     "login-cmds": ["ascenso"],
