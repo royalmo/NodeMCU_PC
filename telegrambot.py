@@ -35,8 +35,8 @@ def load_configs():
     global directory_path
     global nodemcu_ip
     global msg_path
-    directory_path = getcwd()
-    with open((directory_path + "/config.json"), "r") as filein:
+    directory_path = getcwd() + "/"
+    with open((directory_path + "config.json"), "r") as filein:
         configlog = json.loads(filein.read())
     nodemcu_ip = "http://"
     for element in configlog["nodemcu-ip"]:
@@ -45,7 +45,7 @@ def load_configs():
     if configlog["nodemcu-port"] != 80:
         nodemcu_ip += ":" + str(configlog["nodemcu-port"])
     bot = telepot.Bot(configlog["telegram-token"])
-    msg_path = directory_path + "/lang-" + configlog["main-language"] + ".json"
+    msg_path = directory_path + "lang-" + configlog["main-language"] + ".json"
 
 def get_msg(msg_code, is_list = False, list_element = -1):
     global msg_path
@@ -143,23 +143,24 @@ def random_answer(message):
     return randoms[randint(0, len(randoms))]
 
 def insertonlog(date, chat_id, message):
-    with open((directory_path() + "logs_info.json"), "r") as filein:
+    global directory_path
+    with open((directory_path + "logs_info.json"), "r") as filein:
         loginfo = json.loads(filein.read())
-    with open((directory_path() + loginfo["msgs-actual"]), "r") as filein:
+    with open((directory_path + loginfo["msgs-actual"]), "r") as filein:
         lines = len(filein.read().split("\n"))
     result ="[" + date + "] ChatID=" + str(chat_id) + " Message: " + message
     if lines < 100:
-        with open((directory_path() + loginfo["msgs-actual"]), "a") as filein:
+        with open((directory_path + loginfo["msgs-actual"]), "a") as filein:
             filein.write("\n" + result)
     else: #IF LOG FILE IS FULL (+100 lines) IT CREATES ANOTHER
         newlog = loginfo
         newlog["msgs-saved"][loginfo["msgs-actual"]] = time.time()
         newfile = "logs/messages/" + str(int(time.time())) + ".log"
         newlog["msgs-actual"] = newfile
-        fout = open((directory_path() +"logs_info.json"), "w")
+        fout = open((directory_path +"logs_info.json"), "w")
         fout.write(json.dumps(newlog))
         fout.close()
-        with open((directory_path() + newfile), "w") as filein:
+        with open((directory_path + newfile), "w") as filein:
             filein.write(result)
 
 def wget_mcu(extension, update = False): #This function returns the content of a webpage (and does included actions).
