@@ -133,11 +133,15 @@ int RELAYvalue() {
   return digitalRead(Relay);
 }
 
-void PRINTmessage(int code){
+void PRINTmessage(int code, bool from_bot = false){
   //This function prints obligatory header for http response, and the response depending on the code given.
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/plain");
   client.println(""); // IMPORTANT
+  if (from_bot) {
+    client.println(String(code));
+    code = 6;
+  }
   switch (code) {
     case 0 :
       client.println("Done! Check status to verify it yourself.");
@@ -207,7 +211,7 @@ void loop() {
 
   //CHECK IF CLIENT IS THE RASPBERRY
   if (client.remoteIP() != raspberry_ip) {
-    PRINTmessage(3);
+    PRINTmessage(5);
     return;
   }
 
@@ -218,6 +222,20 @@ void loop() {
   if (request.indexOf("/data") != -1)  {
     PRINTmessage(6);
   }
+  else if (request.indexOf("/telegramstart") != -1)  {
+    if (PCvalue()){
+      PRINTmessage(2, true);
+    }
+    else if (FANvalue() == 2) {
+      PRINTmessage(3, true);
+    }
+    else {
+      tone(Buzzer, 880);
+      PCstart();
+      noTone(Buzzer);
+      PRINTmessage(0, true);
+    }
+  }
   else if (request.indexOf("/start") != -1)  {
     if (PCvalue()){
       PRINTmessage(2);
@@ -227,6 +245,18 @@ void loop() {
       PCstart();
       noTone(Buzzer);
       PRINTmessage(0);
+    }
+  }
+  else if (request.indexOf("/telegramshutdown") != -1)  {
+    if (FANvalue() == 0 & PCvalue()){
+      PCshutdown();
+      PRINTmessage(0, true);
+    }
+    else if (not(PCvalue())){
+      PRINTmessage(1, true);
+    }
+    else {
+      PRINTmessage(3, true);
     }
   }
   else if (request.indexOf("/shutdown") != -1)  {

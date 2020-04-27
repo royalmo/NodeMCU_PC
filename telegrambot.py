@@ -100,6 +100,7 @@ def handle(msg):
     else:
         if does_it_contain(message, "login-pwds") and status == 1:
             update_user_op(chat_id, 1, 2)
+            op = 2
             bot.sendMessage(chat_id, json_answers["login-op1-pwd-done"])
         elif does_it_contain(message, "pcstatus-pwds") and op == 1 and status == 2:
             bot.sendMessage(chat_id, json_answers["pcstatus-op1-pwd-done"])
@@ -128,17 +129,9 @@ def send_status():
     return (answer + msg_list[5] + mcustatus[1] + msg_list[int(mcustatus[1]) + 6])
 
 def action_pc(action = "shutdown", op = 3):
-    data = wget_mcu("/data")
-    sleep(10)
-    msg_code = "pc" + action + "-op" + str(op)
-    if data[0] == 1 and data[1] == 0:
-        result = wget_mcu(("/" + action), True)
-        if result[0] == "D":
-            return (msg_code + "-success")
-        else:
-            return (msg_code + "-fail")
-    else:
-        return (msg_code + "-fail-denied")
+    data = wget_mcu("/telegram" + action, True)[0]
+    msg_code = "pc" + action + "-op" + str(op) + "-code" + data
+    return (msg_code)
 
 def random_answer():
     global json_answers
@@ -168,11 +161,11 @@ def insertonlog(date, chat_id, message):
 
 def wget_mcu(extension, update = False): #This function returns the content of a webpage (and does included actions).
     global nodemcu_ip
-    result = get(nodemcu_ip + extension).content.decode("utf-8")
+    result = get(nodemcu_ip + extension).content.decode("utf-8").split("\n")
     sleep(10)
     if update:
-        updatepc()
-    return result
+        updatepc(True, result[1])
+    return result[0]
 
 def get_user_info(chat_id): #This function returns op level of user, and previous status.
     global directory_path
@@ -212,7 +205,7 @@ def add_user(chat_id, op):
     fout.write(dumps(users))
     fout.close()
 
-def updatepc(from_bot = True):
+def updatepc(from_bot = True, data = -1):
     global directory_path
     with open((directory_path + "logs_info.json"), "r") as filein:
         loginfo = loads(filein.read())
@@ -220,10 +213,12 @@ def updatepc(from_bot = True):
         filein = filein.read().split("\n")
         lines = len(filein)
         latest = filein[lines - 1]
-    result = ">>> " + wget_mcu("/status")[0:-1]
+    if data == -1:
+        data = wget_mcu("/data")
+    result = ">>> PC status: " + data[0] + " FAN status: " + data[1]
     if not(result in latest): #UPDATES LOG FILE IF NECESSARY
         if from_bot:
-            result+= "[Requested by Telegram bot]"
+            result+= " [Requested by Telegram bot]"
         if lines < 100:
             with open((directory_path + loginfo["status-actual"]), "a") as filein:
                 filein.write("\n" + str(datetime.now()) + result)
