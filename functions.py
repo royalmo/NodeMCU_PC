@@ -34,9 +34,7 @@ def load_mcu_ip(config_log):
 ## THIS FUNCTION MANAGES ALL MCU REQUESTS, AND UPDATES IF NECESSARY
 
 def wget_mcu(extension, update = False):
-    global nodemcu_ip
-    if not("nodemcu_ip" in globals()):
-        nodemcu_ip = load_mcu_ip(load_configs())
+    nodemcu_ip = load_mcu_ip(load_configs())
     result = get(nodemcu_ip + extension).content.decode("utf-8").split("\n")
     if update:
         update_pc_log(True, result[1])
@@ -45,8 +43,7 @@ def wget_mcu(extension, update = False):
 ## THESE 2 FUNCTIONS GETS INFO FROM MCU (by previous function) AND DO ACTIONS
 ## OR MANAGE ANSWERS IF NECESSARY.
 
-def send_status():
-    global json_answers
+def send_status(json_answers):
     mcustatus = wget_mcu("/data")
     timestring = str(datetime.now())[0:-7].split(" ")
     msg_list = json_answers["pcstatus-answer-protocol"]
@@ -114,8 +111,7 @@ def get_logs_files(type):
 ## THIS FUCNTION IS LIKE AN ADVANCED 'IN' CONDITIONAL
 ## IT RETURNS IF SENTENCE IS IN GROUP OF COMMANDS, EVEN PARTIALLY
 
-def does_it_contain(message, command_code):
-    global json_commands
+def does_it_contain(message, command_code, json_commands):
     keywords = json_commands[command_code]
     for key in keywords:
         if key in message:
@@ -163,7 +159,6 @@ def add_user(chat_id, op):
 
 ## THIS FUNCTION RETURNS RANDOM SENTENCES FROM A LIST, FUTURE A.I., MAYBE?
 
-def random_answer():
-    global json_answers
+def random_answer(json_answers):
     randoms = json_answers["else-messages"]
     return randoms[randint(0, len(randoms)-1)]

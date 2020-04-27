@@ -38,6 +38,7 @@ REQUEST STATUS:
 def handle(msg):
     global bot
     global json_answers
+    global json_commands
     chat_id = msg["chat"]["id"]
     message = msg["text"].replace("\n", " |n ")
     date = strftime("%Y-%m-%d %H:%M:%S", localtime(msg["date"]))
@@ -48,44 +49,44 @@ def handle(msg):
             bot.sendMessage(chat_id, json_answers["first-time-msg"])
             add_user(chat_id, 1)
             bot.sendMessage(chat_id, json_answers["hello-op1"])
-        elif does_it_contain(message, "hello-cmds"):
+        elif does_it_contain(message, "hello-cmds", json_commands):
             bot.sendMessage(chat_id, json_answers["hello-op" + str(op)])
-        elif does_it_contain(message, "help-cmds"):
+        elif does_it_contain(message, "help-cmds", json_commands):
             bot.sendMessage(chat_id, json_answers["help-msg"])
-        elif does_it_contain(message, "login-cmds"):
+        elif does_it_contain(message, "login-cmds", json_commands):
             bot.sendMessage(chat_id, json_answers["login-op" + str(op)])
             if op == 1:
                 update_user_status(chat_id, 1, 1)
-        elif does_it_contain(message, "logout-cmds"):
+        elif does_it_contain(message, "logout-cmds", json_commands):
             bot.sendMessage(chat_id, json_answers["logout-op" + str(op)])
             if op == 2:
                 update_user_op(chat_id, 2, 1)
-        elif does_it_contain(message, "pcstatus-cmds"):
+        elif does_it_contain(message, "pcstatus-cmds", json_commands):
             bot.sendMessage(chat_id, json_answers["pcstatus-op" + str(op) + "-received"])
             if op != 1:
-                bot.sendMessage(chat_id, send_status())
+                bot.sendMessage(chat_id, send_status(json_answers))
             else:
                 update_user_status(chat_id, 1, 2)
-        elif does_it_contain(message, "pcstart-cmds") and op != 1:
+        elif does_it_contain(message, "pcstart-cmds", json_commands) and op != 1:
             bot.sendMessage(chat_id, json_answers["pcstart-op" + str(op) + "-received"])
             if op == 3:
                 bot.sendMessage(chat_id, json_answers[action_pc("start", op)])
             else:
                 update_user_status(chat_id, 2, 2)
-        elif does_it_contain(message, "pcshutdown-cmds") and op == 3:
+        elif does_it_contain(message, "pcshutdown-cmds", json_commands) and op == 3:
             bot.sendMessage(chat_id, json_answers["pcshutdown-op3-received"])
             bot.sendMessage(chat_id, json_answers[action_pc()])
         else:
-            bot.sendMessage(chat_id, random_answer())
+            bot.sendMessage(chat_id, random_answer(json_answers))
     else:
-        if does_it_contain(message, "login-pwds") and status == 1:
+        if does_it_contain(message, "login-pwds", json_commands) and status == 1:
             update_user_op(chat_id, 1, 2)
             op = 2
             bot.sendMessage(chat_id, json_answers["login-op1-pwd-done"])
-        elif does_it_contain(message, "pcstatus-pwds") and op == 1 and status == 2:
+        elif does_it_contain(message, "pcstatus-pwds", json_commands) and op == 1 and status == 2:
             bot.sendMessage(chat_id, json_answers["pcstatus-op1-pwd-done"])
-            bot.sendMessage(chat_id, send_status())
-        elif does_it_contain(message, "pcstart-pwds") and op == 2 and status == 2:
+            bot.sendMessage(chat_id, send_status(json_answers))
+        elif does_it_contain(message, "pcstart-pwds", json_commands) and op == 2 and status == 2:
             bot.sendMessage(chat_id, json_answers["pcstart-op2-pwd-done"])
             bot.sendMessage(chat_id, json_answers[action_pc("start", op)])
         else:
