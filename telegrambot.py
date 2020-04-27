@@ -162,7 +162,6 @@ def insertonlog(date, chat_id, message):
 def wget_mcu(extension, update = False): #This function returns the content of a webpage (and does included actions).
     global nodemcu_ip
     result = get(nodemcu_ip + extension).content.decode("utf-8").split("\n")
-    sleep(10)
     if update:
         updatepc(True, result[1])
     return result[0]
