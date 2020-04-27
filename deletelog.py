@@ -16,13 +16,13 @@ def remove_old():
     with open((directory_path +"logs_info.json"), "r") as filein:
         loginfo = loads(filein.read())
     result = {"msgs-actual": loginfo["msgs-actual"], "status-actual" : loginfo["status-actual"], "msgs-saved" : {}, "status-saved" : {}}
-    result = check_age(result, "msgs", "logs/messages/")
-    result = check_age(result, "status", "logs/status/")
+    result = check_age(result, "msgs", "logs/messages/", loginfo)
+    result = check_age(result, "status", "logs/status/", loginfo)
     fout = open((directory_path +"logs_info.json"), "w")
     fout.write(dumps(result))
     fout.close()
 
-def check_age(result, log_name, log_path):
+def check_age(result, log_name, log_path, loginfo):
     directory_path = str(Path(__file__).parent.absolute()) + "/"
     for filename, saved in loginfo[log_name + "-saved"].items():
         if (saved + 2592000) < time():
