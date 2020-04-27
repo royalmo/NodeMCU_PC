@@ -11,9 +11,6 @@ This file will delete old logs that have more than 30 days since they have been 
 This script will run every day at 5am.
 """
 
-if __name__ == "__main__":
-    remove_old()
-
 def remove_old():
     directory_path = str(Path(__file__).parent.absolute()) + "/"
     with open((directory_path +"logs_info.json"), "r") as filein:
@@ -33,3 +30,6 @@ def check_age(result, log_name, log_path):
         else:
             result[log_name + "-saved"][filename] = saved
     return result
+
+if __name__ == "__main__":
+    remove_old()
