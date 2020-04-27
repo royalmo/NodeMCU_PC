@@ -33,6 +33,8 @@ REQUEST STATUS:
 - 2: Asked action (status or start), waiting for password.
 """
 
+## THIS FUNCTION MANAGES EVERY POSSIBLE ANSWER TO MESSAGES.
+
 def handle(msg):
     global bot
     global json_answers
@@ -90,9 +92,20 @@ def handle(msg):
             bot.sendMessage(chat_id, json_answers["pwd-failed"])
         update_user_status(chat_id, op, 0)
 
+## SATRTUP FUNCTION (well, better call it code than function)
 if __name__ == "__main__":
-    global bot
-    load_configs()
+    directory_path = str(Path(__file__).parent.absolute()) + "/"
+    config_log = load_configs()
+    nodemcu_ip = load_mcu_ip(config_log)
+
+    bot = telepot.Bot(config_log["telegram-token"])
+    msg_path = directory_path + "lang-" + config_log["main-language"] + ".json"
+    with open(msg_path, "r") as filein:
+        json_file = loads(filein.read())
+        json_answers = json_file["answers"]
+        json_commands = json_file["commands"]
+
+    #STARTS BOT, AND INFINITE LOOP TO KEEP IT RUNNING
     MessageLoop(bot, handle).run_as_thread()
     while 1:
         sleep(10)

@@ -14,37 +14,29 @@ from pathlib import Path
 This script contains most important functions for all python files that need some.
 Be sure to read all instructions before modifying at https://github.com/royalmo/NodeMCU_PC
 """
-## THIS FUNCTION LOAD ALL CONFIGLOG SETTINGS, AND ALSO LANGUAGE SETTINGS AND DATA.
+## THIS FUNCTION LOAD ALL CONFIG_LOG SETTINGS, AND ALSO LANGUAGE SETTINGS AND DATA.
 
-def load_configs(only_mcu = False):
-    global bot
-    global nodemcu_ip
-    global msg_path
-    global json_answers
-    global json_commands
+def load_configs():
     directory_path = str(Path(__file__).parent.absolute()) + "/"
     with open((directory_path + "config.json"), "r") as filein:
-        configlog = loads(filein.read())
+        config_log = loads(filein.read())
+    return config_log
+
+def load_mcu_ip(config_log):
     nodemcu_ip = "http://"
-    for element in configlog["nodemcu-ip"]:
+    for element in config_log["nodemcu-ip"]:
         nodemcu_ip += str(element) + "."
     nodemcu_ip = nodemcu_ip[0:-1]
-    if configlog["nodemcu-port"] != 80:
-        nodemcu_ip += ":" + str(configlog["nodemcu-port"])
-    if not(only_mcu):
-        bot = telepot.Bot(configlog["telegram-token"])
-        msg_path = directory_path + "lang-" + configlog["main-language"] + ".json"
-        with open(msg_path, "r") as filein:
-            json_file = loads(filein.read())
-            json_answers = json_file["answers"]
-            json_commands = json_file["commands"]
+    if config_log["nodemcu-port"] != 80:
+        nodemcu_ip += ":" + str(config_log["nodemcu-port"])
+    return nodemcu_ip
 
 ## THIS FUNCTION MANAGES ALL MCU REQUESTS, AND UPDATES IF NECESSARY
 
 def wget_mcu(extension, update = False):
     global nodemcu_ip
     if not("nodemcu_ip" in globals()):
-        load_configs(True)
+        nodemcu_ip = load_mcu_ip(load_configs())
     result = get(nodemcu_ip + extension).content.decode("utf-8").split("\n")
     if update:
         update_pc_log(True, result[1])
