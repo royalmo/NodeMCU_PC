@@ -116,7 +116,7 @@ def get_logs_files(type):
     with open((directory_path + "logs_info.json"), "r") as filein:
         loginfo = loads(filein.read())
     with open((directory_path + loginfo[type + "-actual"]), "r") as filein:
-        logfile filein.read().split("\n")
+        logfile = filein.read().split("\n")
     return [loginfo, logfile]
 
 ## THIS FUCNTION IS LIKE AN ADVANCED 'IN' CONDITIONAL
