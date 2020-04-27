@@ -1,3 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from time import strftime, localtime, sleep, time
+from random import randint
+from datetime import datetime
+import telepot
+from telepot.loop import MessageLoop
+from requests import get
+from json import loads, dumps
+from pathlib import Path
+
 """
 This script contains most important functions for all python files that need some.
 Be sure to read all instructions before modifying at https://github.com/royalmo/NodeMCU_PC

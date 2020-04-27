@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from os import remove
 from pathlib import Path
 from json import loads, dumps
