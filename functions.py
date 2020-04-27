@@ -57,13 +57,9 @@ def action_pc(action = "shutdown", op = 3):
 ## THIS FUNCTION PUTS PC STATUS ONTO LOGFILE
 
 def update_pc_log(from_bot = True, data = -1):
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    with open((directory_path + "logs_info.json"), "r") as filein:
-        loginfo = loads(filein.read())
-    with open((directory_path + loginfo["status-actual"]), "r") as filein:
-        filein = filein.read().split("\n")
-        lines = len(filein)
-        latest = filein[lines - 1]
+    loginfo, logfile = get_logs_files("status")
+    lines = len(logfile)
+    latest = logfile[lines - 1]
     if data == -1:
         data = wget_mcu("/data")
     result = str(datetime.now())[0:-7] + " >>> PCstatus=" + data[0] + " FANstatus=" + data[1]
@@ -108,7 +104,8 @@ def get_logs_files(type):
     with open((directory_path + "logs_info.json"), "r") as filein:
         loginfo = loads(filein.read())
     with open((directory_path + loginfo[type + "-actual"]), "r") as filein:
-        return filein.read().split("\n")
+        logfile filein.read().split("\n")
+    return [loginfo, logfile]
 
 ## THIS FUCNTION IS LIKE AN ADVANCED 'IN' CONDITIONAL
 ## IT RETURNS IF SENTENCE IS IN GROUP OF COMMANDS, EVEN PARTIALLY
