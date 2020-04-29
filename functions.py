@@ -4,8 +4,6 @@
 from time import strftime, localtime, sleep, time
 from random import randint
 from datetime import datetime
-import telepot
-from telepot.loop import MessageLoop
 from requests import get
 from json import loads, dumps
 from pathlib import Path
@@ -63,10 +61,10 @@ def update_pc_log(from_bot = True, data = -1):
     latest = logfile[lines - 1]
     if data == -1:
         data = wget_mcu("/data")
-    result = str(datetime.now())[0:-7] + " >>> PCstatus=" + data[0] + " FANstatus=" + data[1]
+    result = " >>> PCstatus=" + data[0] + " FANstatus=" + data[1]
     if not(result in latest): #UPDATES LOG FILE IF NECESSARY
         if from_bot:
-            result+= " [Requested by Telegram bot]"
+            result = str(datetime.now())[0:-7] + result + " [Requested by Telegram bot]"
         log_work("status", "status", loginfo, result, lines)
 
 ## THIS FUNCTION PUTS EVERY MESSAGE ON THE LOGFILE, INCLUDING DATETIME AND USER_ID

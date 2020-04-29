@@ -22,6 +22,8 @@ def remove_old():
     fout.write(dumps(result))
     fout.close()
 
+## THIS FUNCTION CLEANS THE LOGS, IT'S THE CORE OF THIS FILE.
+
 def check_age(result, log_name, log_path, loginfo):
     directory_path = str(Path(__file__).parent.absolute()) + "/"
     for filename, saved in loginfo[log_name + "-saved"].items():
