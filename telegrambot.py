@@ -93,6 +93,16 @@ def handle(msg):
             bot.sendMessage(chat_id, json_answers["pwd-failed"])
         update_user_status(chat_id, op, 0)
 
+def send_notifications():
+    global bot
+    global json_answers
+    directory_path = str(Path(__file__).parent.absolute()) + "/"
+    with open((directory_path + "allowed_users.json"), "r") as filein:
+        jsonfile = loads(filein.read())
+    for user, notification in jsonfile["notify"]:
+        message = json_answers["notification-" + notification[0]] + notification[1] + "."
+        bot.sendMessage(user, message)
+
 ## SATRTUP FUNCTION (well, better call it code than function)
 if __name__ == "__main__":
     directory_path = str(Path(__file__).parent.absolute()) + "/"
@@ -110,3 +120,4 @@ if __name__ == "__main__":
     MessageLoop(bot, handle).run_as_thread()
     while 1:
         sleep(10)
+        send_notifications()

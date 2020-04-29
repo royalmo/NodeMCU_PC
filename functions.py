@@ -49,13 +49,15 @@ def send_status(json_answers):
     return (answer + msg_list[5] + mcustatus[1] + msg_list[int(mcustatus[1]) + 6])
 
 def action_pc(action = "shutdown", op = 3):
-    data = wget_mcu("/telegram" + action, True)[0]
-    msg_code = "pc" + action + "-op" + str(op) + "-code" + data
+    data = wget_mcu("/telegram" + action, True).split("\n")
+    if op != 3:
+        program_notification(data[1])
+    msg_code = "pc" + action + "-op" + str(op) + "-code" + data[0]
     return (msg_code)
 
 ## THIS FUNCTION PUTS PC STATUS ONTO LOGFILE
 
-def update_pc_log(from_bot = True, data = -1):
+def update_pc_log(from_bot = False, data = -1):
     loginfo, logfile = get_logs_files("status")
     lines = len(logfile)
     latest = logfile[lines - 1]
@@ -64,7 +66,10 @@ def update_pc_log(from_bot = True, data = -1):
     result = " >>> PCstatus=" + data[0] + " FANstatus=" + data[1]
     if not(result in latest): #UPDATES LOG FILE IF NECESSARY
         if from_bot:
-            result = str(datetime.now())[0:-7] + result + " [Requested by Telegram bot]"
+            result = result + " [Requested by Telegram bot]"
+        else:
+            program_notification(data)
+        result = str(datetime.now())[0:-7] + result
         log_work("status", "status", loginfo, result, lines)
 
 ## THIS FUNCTION PUTS EVERY MESSAGE ON THE LOGFILE, INCLUDING DATETIME AND USER_ID
@@ -105,6 +110,18 @@ def get_logs_files(type):
     with open((directory_path + loginfo[type + "-actual"]), "r") as filein:
         logfile = filein.read().split("\n")
     return [loginfo, logfile]
+
+## THIS FUNCTION PREPARES A NOTIFICATION IN A JSON FILE, THEN TELEGRAMBOT.PY
+## WILL SEND THOSE MESSAGES AS THIS FUNCTION CAN'T ACCESS TO BOT VARIABLE
+
+def program_notification(data):
+    directory_path = str(Path(__file__).parent.absolute()) + "/"
+    with open((directory_path + "allowed_users.json"), "r") as filein:
+        loginfo = loads(filein.read())
+    for admin in loginfo["op-3"].keys():
+        loginfo["notify"][admin] = data
+    with open((directory_path + "allowed_users.json"), "w") as fileout:
+        fileout.write(dumps(loginfo))
 
 ## THIS FUCNTION IS LIKE AN ADVANCED 'IN' CONDITIONAL
 ## IT RETURNS IF SENTENCE IS IN GROUP OF COMMANDS, EVEN PARTIALLY

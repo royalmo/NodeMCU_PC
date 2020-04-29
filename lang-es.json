@@ -30,6 +30,8 @@
     "pcstatus-op2-received": "Pregunt\u00e1ndole al s\u00fabdito delegado como est\u00e1 el panorama.",
     "pcstatus-op1-received": "Dame una raz\u00f3n para que te pueda dar datos de la alta nobleza.",
     "pcstatus-op1-pwd-done": "Preguntandole al subdito delegado como est\u00e1 el panorama.",
+    "notify-0": "Debo de comunicarle que ahora la computadora se encuentra apagada, con el FANswitch en posici\u00f3n ",
+    "notify-1": "Debo de comunicarle que ahora la computadora se encuentra encendida, con el FANswitch en posici\u00f3n ",
     "pcstatus-answer-protocol": ["Hoy, ", " a las ", ", la computadora estaba claramente ", "apagada", "encendida",
       ", y el interruptor del ventilador se encontraba en la posici\u00f3n n\u00famero ", ", por lo que puede encender y apagar la computadora.",
       ", por lo que puede encender la computadora.",", por lo que no puede hacer nada."],

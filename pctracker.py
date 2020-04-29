@@ -10,4 +10,4 @@ This file will check every five minutes if PC state has changed. If so, logs wil
 '''
 
 if __name__ == '__main__':
-    update_pc_log(False)
+    update_pc_log()
