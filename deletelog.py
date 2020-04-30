@@ -5,6 +5,7 @@ from os import remove
 from pathlib import Path
 from json import loads, dumps
 from time import time
+from functions import load_json_file, dump_json_file, get_path
 
 """
 This file will delete old logs that have more than 30 days since they have been saved.
@@ -12,15 +13,11 @@ This script will run every day at 5am.
 """
 
 def remove_old():
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    with open((directory_path +"logs_info.json"), "r") as filein:
-        loginfo = loads(filein.read())
+    loginfo = load_json_file("logs_info.json")
     result = {"msgs-actual": loginfo["msgs-actual"], "status-actual" : loginfo["status-actual"], "msgs-saved" : {}, "status-saved" : {}}
     result = check_age(result, "msgs", "logs/messages/", loginfo)
     result = check_age(result, "status", "logs/status/", loginfo)
-    fout = open((directory_path +"logs_info.json"), "w")
-    fout.write(dumps(result))
-    fout.close()
+    dump_json_file("logs_info.json", result)
 
 ## THIS FUNCTION CLEANS THE LOGS, IT'S THE CORE OF THIS FILE.
 
