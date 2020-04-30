@@ -96,28 +96,22 @@ def handle(msg):
 def send_notifications():
     global bot
     global json_answers
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    with open((directory_path + "allowed_users.json"), "r") as filein:
-        jsonfile = loads(filein.read())
+    jsonfile = load_json_file("allowed_users.json")
     for user, notification in jsonfile["notify"].items():
         message = json_answers["notification-" + notification[0]] + notification[1] + "."
         bot.sendMessage(user, message)
     jsonfile["notify"] = {}
-    with open((directory_path + "allowed_users.json"), "w") as fileout:
-        fileout.write(dumps(jsonfile))
+    dump_json_file("allowed_users.json", jsonfile)
 
 ## SATRTUP FUNCTION (well, better call it code than function)
 if __name__ == "__main__":
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    config_log = load_configs()
+    config_log = load_json_file("config.json")
     nodemcu_ip = load_mcu_ip(config_log)
-
     bot = telepot.Bot(config_log["telegram-token"])
-    msg_path = directory_path + "lang-" + config_log["main-language"] + ".json"
-    with open(msg_path, "r") as filein:
-        json_file = loads(filein.read())
-        json_answers = json_file["answers"]
-        json_commands = json_file["commands"]
+
+    json_file = load_json_file("lang-" + config_log["main-language"] + ".json")
+    json_answers = json_file["answers"]
+    json_commands = json_file["commands"]
 
     #STARTS BOT, AND INFINITE LOOP TO KEEP IT RUNNING
     MessageLoop(bot, handle).run_as_thread()

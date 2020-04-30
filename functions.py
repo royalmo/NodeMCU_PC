@@ -12,13 +12,7 @@ from pathlib import Path
 This script contains most important functions for all python files that need some.
 Be sure to read all instructions before modifying at https://github.com/royalmo/NodeMCU_PC
 """
-## THIS FUNCTION LOAD ALL CONFIG_LOG SETTINGS, AND ALSO LANGUAGE SETTINGS AND DATA.
-
-def load_configs():
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    with open((directory_path + "config.json"), "r") as filein:
-        config_log = loads(filein.read())
-    return config_log
+## THIS FUNCTION BUILDS THE NODEMCU's IP.
 
 def load_mcu_ip(config_log):
     nodemcu_ip = "http://"
@@ -29,10 +23,26 @@ def load_mcu_ip(config_log):
         nodemcu_ip += ":" + str(config_log["nodemcu-port"])
     return nodemcu_ip
 
+## SIMPLE FUNCTION THAT RETURNS DIRECTORY PATH
+
+def get_path():
+    return str(Path(__file__).parent.absolute()) + "/"
+
+## FUNCTIONS TO LOAD AND DUMP JSON FILES
+
+def load_json_file(file_path):
+    with open((get_path() + file_path), "r") as filein:
+        return_log = loads(filein.read())
+    return return_log
+
+def dump_json_file(file_path, json_file):
+    with open((get_path() + file_path), "w") as fileout:
+        fileout.write(dumps(json_file))
+
 ## THIS FUNCTION MANAGES ALL MCU REQUESTS, AND UPDATES IF NECESSARY
 
 def wget_mcu(extension, update = False):
-    nodemcu_ip = load_mcu_ip(load_configs())
+    nodemcu_ip = load_mcu_ip(load_json_file("config.json"))
     result = get(nodemcu_ip + extension).content.decode("utf-8").split("\n")
     if update:
         update_pc_log(True, result[1])
@@ -77,37 +87,27 @@ def update_pc_log(from_bot = False, data = -1):
 def insert_on_log(date, chat_id, message):
     loginfo, logfile = get_logs_files("msgs")
     lines = len(logfile)
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    with open((directory_path + "logs_info.json"), "r") as filein:
-        loginfo = loads(filein.read())
-    with open((directory_path + loginfo["msgs-actual"]), "r") as filein:
-        lines = len(filein.read().split("\n"))
     result ="[" + date + "] ChatID=" + str(chat_id) + " Message: " + message
     log_work("msgs", "messages", loginfo, result, lines)
 
 ## THIS TWO NEXT FUNCTIONS PREVENT REPEATING LINES ON THE TWO PREVIOUS FUNCTIONS
 
 def log_work(log_name, log_path, old_log, result, lines):
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
     if lines < 100:
-        with open((directory_path + old_log[log_name + "-actual"]), "a") as filein:
+        with open((get_path() + old_log[log_name + "-actual"]), "a") as filein:
             filein.write("\n" + result)
     else: #IF LOG FILE IS FULL (+100 lines) IT CREATES ANOTHER
         full_log = old_log
         full_log[log_name + "-saved"][old_log[log_name + "-actual"]] = time()
         newfile = "logs/" + log_path + "/" + str(int(time())) + ".log"
         full_log[log_name + "-actual"] = newfile
-        fout = open((directory_path +"logs_info.json"), "w")
-        fout.write(dumps(full_log))
-        fout.close()
-        with open((directory_path + newfile), "w") as filein:
+        dump_json_file("logs_info.json", full_log)
+        with open((get_path() + newfile), "w") as filein:
             filein.write(result)
 
 def get_logs_files(type):
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    with open((directory_path + "logs_info.json"), "r") as filein:
-        loginfo = loads(filein.read())
-    with open((directory_path + loginfo[type + "-actual"]), "r") as filein:
+    loginfo = load_json_file("logs_info.json")
+    with open((get_path() + loginfo[type + "-actual"]), "r") as filein:
         logfile = filein.read().split("\n")
     return [loginfo, logfile]
 
@@ -115,13 +115,10 @@ def get_logs_files(type):
 ## WILL SEND THOSE MESSAGES AS THIS FUNCTION CAN'T ACCESS TO BOT VARIABLE
 
 def program_notification(data):
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    with open((directory_path + "allowed_users.json"), "r") as filein:
-        loginfo = loads(filein.read())
+    loginfo = load_json_file("allowed_users.json")
     for admin in loginfo["op-3"].keys():
         loginfo["notify"][admin] = data
-    with open((directory_path + "allowed_users.json"), "w") as fileout:
-        fileout.write(dumps(loginfo))
+    dump_json_file("allowed_users.json", loginfo)
 
 ## THIS FUCNTION IS LIKE AN ADVANCED 'IN' CONDITIONAL
 ## IT RETURNS IF SENTENCE IS IN GROUP OF COMMANDS, EVEN PARTIALLY
@@ -136,41 +133,27 @@ def does_it_contain(message, command_code, json_commands):
 ## THESE 4 FUNCTIONS MANAGE USER SETTINGS, AND ARE REQEUSTED BY HANDLE
 
 def get_user_info(chat_id):
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    with open((directory_path + "allowed_users.json"), "r") as filein:
-        users = loads(filein.read())
+    users = load_json_file("allowed_users.json")
     for op_level in users:
         if str(chat_id) in users[op_level]:
             return [int(op_level[3]), users[op_level][str(chat_id)]]
     return [0, 0]
 
 def update_user_op(chat_id, oldop, newop):
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    with open((directory_path + "allowed_users.json"), "r") as filein:
-        users = loads(filein.read())
+    users = load_json_file("allowed_users.json")
     users[("op-" + str(newop))][str(chat_id)] = users[("op-" + str(oldop))][str(chat_id)]
     users[("op-" + str(oldop))].pop(str(chat_id))
-    fout = open((directory_path + "allowed_users.json"), "w")
-    fout.write(dumps(users))
-    fout.close()
+    dump_json_file("allowed_users.json", users)
 
 def update_user_status(chat_id, op, newstatus):
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    with open((directory_path + "allowed_users.json"), "r") as filein:
-        users = loads(filein.read())
+    users = load_json_file("allowed_users.json")
     users[("op-" + str(op))][str(chat_id)] = newstatus
-    fout = open((directory_path + "allowed_users.json"), "w")
-    fout.write(dumps(users))
-    fout.close()
+    dump_json_file("allowed_users.json", users)
 
 def add_user(chat_id, op):
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
-    with open((directory_path + "allowed_users.json"), "r") as filein:
-        users = loads(filein.read())
+    users = load_json_file("allowed_users.json")
     users[("op-" + str(op))][str(chat_id)] = 0
-    fout = open((directory_path + "allowed_users.json"), "w")
-    fout.write(dumps(users))
-    fout.close()
+    dump_json_file("allowed_users.json", users)
 
 ## THIS FUNCTION RETURNS RANDOM SENTENCES FROM A LIST, FUTURE A.I., MAYBE?
 
