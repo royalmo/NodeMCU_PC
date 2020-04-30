@@ -102,6 +102,9 @@ def send_notifications():
     for user, notification in jsonfile["notify"].items():
         message = json_answers["notification-" + notification[0]] + notification[1] + "."
         bot.sendMessage(user, message)
+    jsonfile["notify"] = {}
+    with open((directory_path + "allowed_users.json"), "w") as fileout:
+        fileout.write(dumps(jsonfile))
 
 ## SATRTUP FUNCTION (well, better call it code than function)
 if __name__ == "__main__":
