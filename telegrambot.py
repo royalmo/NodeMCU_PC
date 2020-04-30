@@ -99,7 +99,7 @@ def send_notifications():
     directory_path = str(Path(__file__).parent.absolute()) + "/"
     with open((directory_path + "allowed_users.json"), "r") as filein:
         jsonfile = loads(filein.read())
-    for user, notification in jsonfile["notify"]:
+    for user, notification in jsonfile["notify"].items():
         message = json_answers["notification-" + notification[0]] + notification[1] + "."
         bot.sendMessage(user, message)
 
