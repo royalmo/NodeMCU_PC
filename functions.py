@@ -88,7 +88,7 @@ def update_pc_log(from_bot = False, data = -1):
             result = result + " [Requested by Telegram bot]"
         elif latest[33] == "S": #2020-05-01 12:10:02 >>> PCstatus=S FANstatus=1 CHECKS IF PCSTATUS IS 'S'
             result = result + " [Confirmed shutdown]"
-        else:
+        elif data != "EE":
             program_notification(data)
         result = str(datetime.now())[0:-7] + result
         log_work("status", "status", loginfo, result, lines)
