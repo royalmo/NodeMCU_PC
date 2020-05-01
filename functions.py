@@ -43,7 +43,10 @@ def dump_json_file(file_path, json_file):
 
 def wget_mcu(extension, update = False):
     nodemcu_ip = load_mcu_ip(load_json_file("config.json"))
-    result = get(nodemcu_ip + extension).content.decode("utf-8").split("\n")
+    try:
+        result = get(nodemcu_ip + extension).content.decode("utf-8").split("\n")
+    except:
+        return "Got error"
     if update:
         update_pc_log(True, result[1])
     return result[0]
@@ -53,6 +56,8 @@ def wget_mcu(extension, update = False):
 
 def send_status(json_answers):
     mcustatus = wget_mcu("/data")
+    if mcustatus == "Got error":
+        return json_answers["connection-error"]
     timestring = str(datetime.now())[0:-7].split(" ")
     msg_list = json_answers["pcstatus-answer-protocol"]
     answer = msg_list[0] + timestring[0] + msg_list[1] + timestring[1] + msg_list[2] + msg_list[int(mcustatus[0]) + 3]
@@ -60,10 +65,12 @@ def send_status(json_answers):
 
 def action_pc(action = "shutdown", op = 3):
     data = wget_mcu("/telegram" + action, True).split("\n")
+    if mcustatus == "Got error":
+        return "connection-error"
     if op != 3:
         program_notification(data[1])
     msg_code = "pc" + action + "-op" + str(op) + "-code" + data[0][0]
-    return (msg_code)
+    return msg_code
 
 ## THIS FUNCTION PUTS PC STATUS ONTO LOGFILE
 
@@ -73,10 +80,14 @@ def update_pc_log(from_bot = False, data = -1):
     latest = logfile[lines - 1]
     if data == -1:
         data = wget_mcu("/data")
+        if data == "Got error":
+            data "EE"
     result = " >>> PCstatus=" + data[0] + " FANstatus=" + data[1]
     if not(result in latest): #UPDATES LOG FILE IF NECESSARY
         if from_bot:
             result = result + " [Requested by Telegram bot]"
+        elif latest[33] == "S": #2020-05-01 12:10:02 >>> PCstatus=S FANstatus=1 CHECKS IF PCSTATUS IS 'S'
+            result = result + " [Confirmed shutdown]"
         else:
             program_notification(data)
         result = str(datetime.now())[0:-7] + result

@@ -133,13 +133,17 @@ int RELAYvalue() {
   return digitalRead(Relay);
 }
 
-void PRINTmessage(int code, bool from_bot = false){
+void PRINTmessage(int code, bool from_bot = false, bool shutdown = false){
   //This function prints obligatory header for http response, and the response depending on the code given.
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/plain");
   client.println(""); // IMPORTANT
   if (from_bot) {
     client.println(String(code));
+    if (shutdown) {
+      client.println("S") + String(FANvalue()));
+      return void;
+    }
     code = 6;
   }
   switch (code) {
@@ -250,7 +254,7 @@ void loop() {
   else if (request.indexOf("/telegramshutdown") != -1)  {
     if (FANvalue() == 0 & PCvalue()){
       PCshutdown();
-      PRINTmessage(0, true);
+      PRINTmessage(0, true, true);
     }
     else if (not(PCvalue())){
       PRINTmessage(1, true);
