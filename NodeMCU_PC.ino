@@ -11,7 +11,7 @@ const char* password = "**********";
 IPAddress ip(192, 168, 1, 99); //Define the best settings for you. I putted example IPs.
 IPAddress gateway(192, 168, 1, 0);
 IPAddress subnet(255, 255, 255, 0);
-IPAdress raspberry_ip(192, 168, 1, 24); //You need to configure the raspberry's static IP on the board or the router.
+IPAddress raspberry_ip(192, 168, 1, 24); //You need to configure the raspberry's static IP on the board or the router.
 
 //GLOBAL VARIABLES
 WiFiServer server(80);
@@ -141,8 +141,8 @@ void PRINTmessage(int code, bool from_bot = false, bool shutdown = false){
   if (from_bot) {
     client.println(String(code));
     if (shutdown) {
-      client.println("S") + String(FANvalue()));
-      return void;
+      client.println("S" + String(FANvalue()));
+      return;
     }
     code = 6;
   }
