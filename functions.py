@@ -65,7 +65,7 @@ def send_status(json_answers):
 
 def action_pc(action = "shutdown", op = 3):
     data = wget_mcu("/telegram" + action, True).split("\n")
-    if data == "Got error":
+    if data[0] == "Got error":
         return "connection-error"
     if op != 3:
         program_notification(data[1])
