@@ -81,7 +81,7 @@ def update_pc_log(from_bot = False, data = -1):
     if data == -1:
         data = wget_mcu("/data")
         if data == "Got error":
-            data "EE"
+            data = "EE"
     result = " >>> PCstatus=" + data[0] + " FANstatus=" + data[1]
     if not(result in latest): #UPDATES LOG FILE IF NECESSARY
         if from_bot:
