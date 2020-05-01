@@ -77,7 +77,7 @@ def action_pc(action = "shutdown", op = 3):
 def update_pc_log(from_bot = False, data = -1):
     loginfo, logfile = get_logs_files("status")
     lines = len(logfile)
-    latest = logfile[lines - 1]
+    latest = get_latest_line(logfile)
     if data == -1:
         data = wget_mcu("/data")
         if data == "Got error":
@@ -92,6 +92,16 @@ def update_pc_log(from_bot = False, data = -1):
             program_notification(data)
         result = str(datetime.now())[0:-7] + result
         log_work("status", "status", loginfo, result, lines)
+
+## THIS FUNCTION GETS THE LATEST NON-ERROR LOG LINE
+
+def get_latest_line(logfile):
+    i = len(logfile)
+    while i > 0:
+        i -= 1
+        if not " >>> PCstatus=E FANstatus=E" in logfile[i]:
+            return logfile[i]
+    return logfile[0]
 
 ## THIS FUNCTION PUTS EVERY MESSAGE ON THE LOGFILE, INCLUDING DATETIME AND USER_ID
 
