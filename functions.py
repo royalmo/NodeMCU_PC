@@ -62,7 +62,7 @@ def action_pc(action = "shutdown", op = 3):
     data = wget_mcu("/telegram" + action, True).split("\n")
     if op != 3:
         program_notification(data[1])
-    msg_code = "pc" + action + "-op" + str(op) + "-code" + data[0]
+    msg_code = "pc" + action + "-op" + str(op) + "-code" + data[0][0]
     return (msg_code)
 
 ## THIS FUNCTION PUTS PC STATUS ONTO LOGFILE
