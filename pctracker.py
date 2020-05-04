@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from functions import update_pc_log, wget_mcu, get_path, load_json_file, dump_json_file, log_work, get_logs_files
-from pathlib import Path
-from json import loads, dumps
+from functions import update_pc_log
 
 '''
 This file will check every five minutes if PC state has changed. If so, logs will be written down.

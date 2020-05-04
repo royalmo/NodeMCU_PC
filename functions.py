@@ -62,13 +62,13 @@ def send_status(json_answers):
     result = timestring + [json_answers["pc-stages"][int(mcustatus[0])], mcustatus[1]]
     return json_answers["pcstatus-answer"][0].format(*result) + json_answers["pcstatus-answer"][int(mcustatus[1]) + 1]
 
-def action_pc(action = "shutdown", op = 3):
+def action_pc(action = "shutdown", op = "3"):
     data = wget_mcu("/telegram" + action, True).split("\n")
     if data[0] == "Got error":
         return "connection-error"
-    if op != 3:
+    if op != "3":
         program_notification(data[1])
-    msg_code = "pc" + action + "-op" + str(op) + "-code" + data[0][0]
+    msg_code = "pc" + action + "-op" + op + "-code" + data[0][0]
     return msg_code
 
 ## THIS FUNCTION PUTS PC STATUS ONTO LOGFILE
@@ -158,24 +158,24 @@ class TelegramUser(object):
         super(TelegramUser, self).__init__()
         self.id = id
         userlist = load_json_file("allowed_users.json")
-        self.op = 0
-        self.status = 0
+        self.op = "0"
+        self.status = "0"
         for op_level in userlist:
-            if str(self.id) in userlist[op_level]:
-                self.op = int(op_level[3])
-                self.status = userlist[op_level][str(self.id)]
-        if self.op == 0:
+            if self.id in userlist[op_level]:
+                self.op = op_level[3]
+                self.status = userlist[op_level][self.id]
+        if self.op == "0":
             userlist["op-1"][self.id] = 0
             dump_json_file("allowed_users.json", userlist)
     def update_op(self, newop):
         userlist = load_json_file("allowed_users.json")
-        userlist[("op-" + str(newop))][str(self.id)] = userlist[("op-" + str(self.op))][str(self.id)]
-        userlist[("op-" + str(self.op))].pop(str(self.id))
+        userlist[("op-" + newop)][self.id] = userlist[("op-" + self.op)][self.id]
+        userlist[("op-" + self.op)].pop(self.id)
         dump_json_file("allowed_users.json", userlist)
         self.op = newop
     def update_status(self, newstatus):
         userlist = load_json_file("allowed_users.json")
-        userlist[("op-" + str(self.op))][str(self.id)] = newstatus
+        userlist[("op-" + self.op)][self.id] = newstatus
         dump_json_file("allowed_users.json", userlist)
         self.status = newstatus
 

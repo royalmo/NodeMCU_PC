@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from os import remove
-from pathlib import Path
-from json import loads, dumps
 from time import time
 from functions import load_json_file, dump_json_file, get_path
 
@@ -22,7 +20,7 @@ def remove_old():
 ## THIS FUNCTION CLEANS THE LOGS, IT'S THE CORE OF THIS FILE.
 
 def check_age(result, log_name, log_path, loginfo):
-    directory_path = str(Path(__file__).parent.absolute()) + "/"
+    directory_path = get_path()
     for filename, saved in loginfo[log_name + "-saved"].items():
         if (saved + 2592000) < time():
             remove((directory_path + log_path + filename))
