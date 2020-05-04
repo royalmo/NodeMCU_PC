@@ -81,7 +81,7 @@ def update_pc_log(from_bot = False, data = -1):
         if data == "Got error":
             data = "EE"
     result = " >>> PCstatus=" + data[0] + " FANstatus=" + data[1]
-    if not(result in latest): #UPDATES LOG FILE IF NECESSARY
+    if not(result in latest) and data != "EE": #UPDATES LOG FILE IF NECESSARY (remove the EE unequal if you want to save also errors)
         if from_bot:
             result = result + " [Requested by Telegram bot]"
         elif latest[33] == "S": #2020-05-01 12:10:02 >>> PCstatus=S FANstatus=1 CHECKS IF PCSTATUS IS 'S'
