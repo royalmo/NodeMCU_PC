@@ -151,7 +151,7 @@ def does_it_contain(message, command_code, json_commands):
             return True
     return False
 
-## THESE 4 FUNCTIONS MANAGE USER SETTINGS, AND ARE REQEUSTED BY HANDLE
+## THESE CLASS HANDLES ALL USER ACTIONS
 
 class TelegramUser(object):
     """This class does all necessary actions to telegram users."""
@@ -179,29 +179,6 @@ class TelegramUser(object):
         userlist[("op-" + str(self.op))][str(self.id)] = newstatus
         dump_json_file("allowed_users.json", userlist)
         self.status = newstatus
-
-def get_user_info(chat_id):
-    users = load_json_file("allowed_users.json")
-    for op_level in users:
-        if str(chat_id) in users[op_level]:
-            return [int(op_level[3]), users[op_level][str(chat_id)]]
-    return [0, 0]
-
-def update_user_op(chat_id, oldop, newop):
-    users = load_json_file("allowed_users.json")
-    users[("op-" + str(newop))][str(chat_id)] = users[("op-" + str(oldop))][str(chat_id)]
-    users[("op-" + str(oldop))].pop(str(chat_id))
-    dump_json_file("allowed_users.json", users)
-
-def update_user_status(chat_id, op, newstatus):
-    users = load_json_file("allowed_users.json")
-    users[("op-" + str(op))][str(chat_id)] = newstatus
-    dump_json_file("allowed_users.json", users)
-
-def add_user(chat_id, op):
-    users = load_json_file("allowed_users.json")
-    users[("op-" + str(op))][str(chat_id)] = 0
-    dump_json_file("allowed_users.json", users)
 
 ## THIS FUNCTION RETURNS RANDOM SENTENCES FROM A LIST, FUTURE A.I., MAYBE?
 

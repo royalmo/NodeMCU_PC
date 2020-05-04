@@ -78,18 +78,18 @@ def handle(msg):
         else:
             bot.sendMessage(chat_id, random_answer(json_answers))
     else:
-        if does_it_contain(message, "login-pwds", json_commands) and status == 1:
+        if does_it_contain(message, "login-pwds", json_commands) and user.status == 1:
             user.update_op(2)
             bot.sendMessage(chat_id, json_answers["login-op1-pwd-done"])
-        elif does_it_contain(message, "pcstatus-pwds", json_commands) and user.op == 1 and status == 2:
+        elif does_it_contain(message, "pcstatus-pwds", json_commands) and user.op == 1 and user.status == 2:
             bot.sendMessage(chat_id, json_answers["pcstatus-op1-pwd-done"])
             bot.sendMessage(chat_id, send_status(json_answers))
-        elif does_it_contain(message, "pcstart-pwds", json_commands) and user.op == 2 and status == 2:
+        elif does_it_contain(message, "pcstart-pwds", json_commands) and user.op == 2 and user.status == 2:
             bot.sendMessage(chat_id, json_answers["pcstart-op2-pwd-done"])
             bot.sendMessage(chat_id, json_answers[action_pc("start", user.op)])
         else:
             bot.sendMessage(chat_id, json_answers["pwd-failed"])
-        update_user_status(chat_id, user.op, 0)
+        user.update_status(0)
 
 def send_notifications():
     global bot
