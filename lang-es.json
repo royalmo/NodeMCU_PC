@@ -33,7 +33,7 @@
     "notification": "Debo de comunicarle que ahora la computadora se encuentra en estado {}, con el FANswitch en posici\u00f3n {}.",
     "connection-error": "Ha habido un problema al conectar con el guiri del MCU, reintenta en un rato plis.",
     "pc-stages": ["apagado", "encendido"],
-    "pcstatus-answer": ["Hoy, {} a las {}, la computadora estaba en el estado {}, y el interruptor del ventilador se encontraba en la posici\u00f3n n\u00famero {}.",
+    "pcstatus-answer": ["Hoy, {} a las {}, la computadora estaba en el estado {}, y el interruptor del ventilador se encontraba en la posici\u00f3n n\u00famero {}. ",
       "Puede encender y apagar la computadora.", "Puede encender la computadora.","No puede hacer nada."],
     "pwd-failed": "Tonto quien lo lea, AAHAHAHAHAHAH TOMA INDIRECTA PRINGAO QUE NO TE SABES NI LAS CONTRAS.",
     "else-messages": ["Lo siento, pero me llamo Osvaldo, no Alexa, y en consecuente no dispongo de infinitas respuestas para tus mierdas.",
