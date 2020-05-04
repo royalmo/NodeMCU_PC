@@ -165,7 +165,7 @@ class TelegramUser(object):
                 self.op = op_level[3]
                 self.status = userlist[op_level][self.id]
         if self.op == "0":
-            userlist["op-1"][self.id] = 0
+            userlist["op-1"][self.id] = "0"
             dump_json_file("allowed_users.json", userlist)
     def update_op(self, newop):
         userlist = load_json_file("allowed_users.json")
