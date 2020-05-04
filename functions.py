@@ -58,10 +58,8 @@ def send_status(json_answers):
     mcustatus = wget_mcu("/data")
     if mcustatus == "Got error":
         return json_answers["connection-error"]
-    timestring = str(datetime.now())[0:-7].split(" ")
-    msg_list = json_answers["pcstatus-answer-protocol"]
-    answer = msg_list[0] + timestring[0] + msg_list[1] + timestring[1] + msg_list[2] + msg_list[int(mcustatus[0]) + 3]
-    return (answer + msg_list[5] + mcustatus[1] + msg_list[int(mcustatus[1]) + 6])
+    timestring = str(datetime.now())[0:-7].split(" ").append(json_answers["pc-stages"][int(mcustatus[0])])
+    return json_answers["pcstatus-answer"][0].format(timestring.append(json_answers["pcstatus-answer"][int(mcustatus[1]) + 1]))
 
 def action_pc(action = "shutdown", op = 3):
     data = wget_mcu("/telegram" + action, True).split("\n")
