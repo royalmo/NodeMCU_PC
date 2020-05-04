@@ -38,7 +38,7 @@ def handle(msg):
     message = msg["text"].replace("\n", " |n ")
     date = strftime("%Y-%m-%d %H:%M:%S", localtime(msg["date"]))
     insert_on_log(date, chat_id, message)
-    user = TelegramUser(chat_id)
+    user = TelegramUser(str(chat_id))
     if user.status == "0": #IF AWAITING FOR PASSWORD
         if user.op == "0": #NEW USER
             bot.sendMessage(chat_id, json_answers["first-time-msg"])
