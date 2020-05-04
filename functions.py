@@ -153,6 +153,33 @@ def does_it_contain(message, command_code, json_commands):
 
 ## THESE 4 FUNCTIONS MANAGE USER SETTINGS, AND ARE REQEUSTED BY HANDLE
 
+class TelegramUser(object):
+    """This class does all necessary actions to telegram users."""
+    def __init__(self, id):
+        super(TelegramUser, self).__init__()
+        self.id = id
+        userlist = load_json_file("allowed_users.json")
+        self.op = 0
+        self.status = 0
+        for op_level in userlist:
+            if str(self.id) in userlist[op_level]:
+                self.op = int(op_level[3])
+                self.status = userlist[op_level][str(self.id)]
+        if self.op == 0:
+            userlist["op-1"][self.id] = 0
+            dump_json_file("allowed_users.json", userlist)
+    def update_op(self, newop):
+        userlist = load_json_file("allowed_users.json")
+        userlist[("op-" + str(newop))][str(self.id)] = userlist[("op-" + str(self.op))][str(self.id)]
+        userlist[("op-" + str(self.op))].pop(str(self.id))
+        dump_json_file("allowed_users.json", userlist)
+        self.op = newop
+    def update_status(self, newstatus):
+        userlist = load_json_file("allowed_users.json")
+        userlist[("op-" + str(self.op))][str(self.id)] = newstatus
+        dump_json_file("allowed_users.json", userlist)
+        self.status = newstatus
+
 def get_user_info(chat_id):
     users = load_json_file("allowed_users.json")
     for op_level in users:
