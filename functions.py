@@ -161,7 +161,7 @@ class TelegramUser(object):
         self.op = "0"
         self.status = "0"
         for op_level in userlist:
-            if self.id in userlist[op_level]:
+            if self.id in userlist[op_level] and op_level != "notify":
                 self.op = op_level[3]
                 self.status = userlist[op_level][self.id]
         if self.op == "0":

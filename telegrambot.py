@@ -91,7 +91,7 @@ def send_notifications():
     global json_answers
     jsonfile = load_json_file("allowed_users.json")
     for user, notification in jsonfile["notify"].items():
-        bot.sendMessage(user, json_answers["notification"].format(json_answers["pc-stages"][notification[0]], notification[1]))
+        bot.sendMessage(user, json_answers["notification"].format(json_answers["pc-stages"][int(notification[0])], notification[1]))
     jsonfile["notify"] = {}
     dump_json_file("allowed_users.json", jsonfile)
 
