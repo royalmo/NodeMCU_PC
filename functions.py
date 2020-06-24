@@ -135,10 +135,11 @@ def get_logs_files(type):
 ## WILL SEND THOSE MESSAGES AS THIS FUNCTION CAN'T ACCESS TO BOT VARIABLE
 
 def program_notification(data):
-    loginfo = load_json_file("allowed_users.json")
-    for admin in loginfo["op-3"].keys():
-        loginfo["notify"][admin] = data
-    dump_json_file("allowed_users.json", loginfo)
+    if data[0:2] in ["00", "01", "02", "10", "11", "12"]:
+        loginfo = load_json_file("allowed_users.json")
+        for admin in loginfo["op-3"].keys():
+            loginfo["notify"][admin] = data
+        dump_json_file("allowed_users.json", loginfo)
 
 ## THIS FUCNTION IS LIKE AN ADVANCED 'IN' CONDITIONAL
 ## IT RETURNS IF SENTENCE IS IN GROUP OF COMMANDS, EVEN PARTIALLY
