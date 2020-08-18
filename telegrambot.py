@@ -95,10 +95,12 @@ def handle(msg):
             except:
                 bot.sendMessage(chat_id, json_answers["camera-error"])
         elif does_it_contain(message, "save-last-img-cmds", json_commands) and user.op != "1":
-            if save_last_img():
-                bot.sendMessage(chat_id, json_answers["save-photo"])
-            else:
+            try:
+                save_last_img(date.replace(" ", "_"))
+            except:
                 bot.sendMessage(chat_id, json_answers["camera-error"])
+            else:
+                bot.sendMessage(chat_id, json_answers["save-photo"])
         else:
             bot.sendMessage(chat_id, random_answer(json_answers))
     else:

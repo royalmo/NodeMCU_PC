@@ -196,11 +196,6 @@ def take_snapshot(bot, chat_id, cam_id):
     with open(get_path() + "last_snapshot.jpg", "rb") as photo:
         bot.sendPhoto(chat_id, photo)
 
-def save_last_img():
-    try:
-        newfile = load_json_file("config.json")["save-path"] + str(int(time())) + ".jpg"
-        system("cp " + get_path() + "last_snapshot.jpg " + newfile)
-    except:
-        return False
-    else:
-        return True
+def save_last_img(date):
+    newfile = load_json_file("config.json")["save-path"] + "/" + date + ".jpg"
+    system("cp " + get_path() + "last_snapshot.jpg " + newfile)
