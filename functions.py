@@ -7,6 +7,7 @@ from datetime import datetime
 from requests import get
 from json import loads, dumps
 from pathlib import Path
+from os import system
 
 """
 This script contains most important functions for all python files that need some.
@@ -186,20 +187,19 @@ def random_answer(json_answers):
     randoms = json_answers["else-messages"]
     return randoms[randint(0, len(randoms)-1)]
 
-## FUNCTIONS FOR ACCESSING CAMERA STUFF
+## FUNCTIONS FOR ACCESSING CAMERA STUFF & SAVE IT
 
 def take_snapshot(cam_id):
-    pass
+    if cam_id != -1:
+        system('URL="' + load_json_file("config.json")["snapshot-urls"][cam_id] + '"; wget "$URL" -O ' + get_path() + 'last_snapshot.jpg')
+    with open(get_path() + "last_snapshot.jpg", "rb") as photo:
+        return photo
 
 def save_last_img():
-    return False
-
-
-# f = open('zzzzzzzz.jpg', 'rb')
-# response = bot.sendPhoto(chat_id, f)
-
-# 'URL="' + url + '"; wget "$URL" -O ' + path + 'last_snapshot.jpg'
-
-# import os
-
-# os.system("echo Hello from the other side!")
+    try:
+        newfile = load_json_file("config.json")["save-path"] + str(int(time())) + ".jpg"
+        system("cp " + get_path() + "last_snapshot.jpg " + newfile)
+    except:
+        return False
+    else:
+        return True
