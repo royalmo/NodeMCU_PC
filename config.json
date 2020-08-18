@@ -6,9 +6,12 @@
   "wifi-pwd": "ljkhgfdkjlfdsg",
   "main-language": "es",
 
-  "cam1-snapshot-url": "",
-  "cam2-snapshot-url": "",
-  "cam3-snapshot-url": "",
+  "snapshot-urls": [
+    "http://some.url/to/get/to/cam/image/using/wget",
+    "http://this.url/can/have?some=arguments&and=things&like=that"
+  ],
+
+  "save-path": "/home/pi/NodeMCU_PC/media",
 
   "subnet-mask": [255, 255, 255, 0],
   "gateway": [192, 168, 1, 0],
