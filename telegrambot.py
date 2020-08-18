@@ -39,7 +39,7 @@ def handle(msg):
     date = strftime("%Y-%m-%d %H:%M:%S", localtime(msg["date"]))
     insert_on_log(date, chat_id, message)
     user = TelegramUser(str(chat_id))
-    if user.status == "0": #IF AWAITING FOR PASSWORD
+    if user.status == "0": #IF NOT AWAITING FOR PASSWORD
         if user.op == "0": #NEW USER
             bot.sendMessage(chat_id, json_answers["first-time-msg"])
             bot.sendMessage(chat_id, json_answers["hello-op1"])
@@ -70,6 +70,35 @@ def handle(msg):
         elif does_it_contain(message, "pcshutdown-cmds", json_commands) and user.op == "3":
             bot.sendMessage(chat_id, json_answers["pcshutdown-op3-received"])
             bot.sendMessage(chat_id, json_answers[action_pc()])
+        elif does_it_contain(message, "camera-entry-cmds", json_commands) and user.op != "1":
+            bot.sendMessage(chat_id, json_answers["camera-response"])
+            try:
+                bot.sendPhoto(chat_id, take_snapshot(0))
+            except:
+                bot.sendMessage(chat_id, json_answers["camera-error"])
+        elif does_it_contain(message, "camera-rout1-cmds", json_commands) and user.op != "1":
+            bot.sendMessage(chat_id, json_answers["camera-response"])
+            try:
+                bot.sendPhoto(chat_id, take_snapshot(1))
+            except:
+                bot.sendMessage(chat_id, json_answers["camera-error"])
+        elif does_it_contain(message, "camera-rout2-cmds", json_commands) and user.op != "1":
+            bot.sendMessage(chat_id, json_answers["camera-response"])
+            try:
+                bot.sendPhoto(chat_id, take_snapshot(2))
+            except:
+                bot.sendMessage(chat_id, json_answers["camera-error"])
+        elif does_it_contain(message, "camera-last-img-cmds", json_commands) and user.op != "1":
+            bot.sendMessage(chat_id, json_answers["camera-last-img-response"])
+            try:
+                bot.sendPhoto(chat_id, take_snapshot(-1))
+            except:
+                bot.sendMessage(chat_id, json_answers["camera-error"])
+        elif does_it_contain(message, "save-last-img-cmds", json_commands) and user.op != "1":
+            if save_last_img():
+                bot.sendMessage(chat_id, json_answers["save-photo"])
+            else:
+                bot.sendMessage(chat_id, json_answers["camera-error"])
         else:
             bot.sendMessage(chat_id, random_answer(json_answers))
     else:

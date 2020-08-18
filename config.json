@@ -6,6 +6,10 @@
   "wifi-pwd": "ljkhgfdkjlfdsg",
   "main-language": "es",
 
+  "cam1-snapshot-url": "",
+  "cam2-snapshot-url": "",
+  "cam3-snapshot-url": "",
+
   "subnet-mask": [255, 255, 255, 0],
   "gateway": [192, 168, 1, 0],
   "nodemcu-port": 80

@@ -185,3 +185,11 @@ class TelegramUser(object):
 def random_answer(json_answers):
     randoms = json_answers["else-messages"]
     return randoms[randint(0, len(randoms)-1)]
+
+## FUNCTIONS FOR ACCESSING CAMERA STUFF
+
+def take_snapshot(cam_id):
+    pass
+
+def save_last_img():
+    return False

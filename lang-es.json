@@ -32,13 +32,24 @@
     "pcstatus-op1-pwd-done": "Pregunt\u00e1ndole al s\u00fabdito delegado c\u00f3mo est\u00e1 el panorama.",
     "notification": "Debo de comunicarle que ahora la computadora se encuentra en estado {}, con el FANswitch en posici\u00f3n {}.",
     "connection-error": "Ha habido un problema al conectar con el guiri del MCU, reintenta en un rato plis.",
+    "camera-response": "Ahora le mando un plano de la sala :)",
+    "camera-last-img-response": "Ahora busco la foto mas reciente!",
+    "camera-error": "No he podido acceder a la foto de la webcam, lo siento...",
+    "save-photo": "He conservado su foto para siempre, al lado del disco duro!",
     "pc-stages": ["apagado", "encendido"],
-    "pcstatus-answer": ["Hoy, {} a las {}, la computadora estaba en el estado {}, y el interruptor del ventilador se encontraba en la posici\u00f3n n\u00famero {}. ",
-      "Puede encender y apagar la computadora.", "Puede encender la computadora.","No puede hacer nada."],
+    "pcstatus-answer": [
+      "Hoy, {} a las {}, la computadora estaba en el estado {}, y el interruptor del ventilador se encontraba en la posici\u00f3n n\u00famero {}. ",
+      "Puede encender y apagar la computadora.",
+      "Puede encender la computadora.",
+      "No puede hacer nada."
+    ],
     "pwd-failed": "Tonto quien lo lea, AAHAHAHAHAHAH TOMA INDIRECTA PRINGAO QUE NO TE SABES NI LAS CONTRAS.",
-    "else-messages": ["Lo siento, pero me llamo Osvaldo, no Alexa, y en consecuente no dispongo de infinitas respuestas para tus mierdas.",
+    "else-messages": [
+      "Lo siento, pero me llamo Osvaldo, no Alexa, y en consecuente no dispongo de infinitas respuestas para tus mierdas.",
       "Mira que eres pesado, que he dicho que no quiero una licuadora...",
-      "Soy de los que piensan que 1 es igual a 2.", "Me comentan por el pinganillo que los porros te suben muy r\u00e1pido, amigo."]
+      "Soy de los que piensan que 1 es igual a 2.",
+      "Me comentan por el pinganillo que los porros te suben muy r\u00e1pido, amigo."
+    ]
   },
   "commands":
   {
@@ -51,6 +62,11 @@
     "pcshutdown-cmds": ["aralo todo"],
     "login-pwds": ["eyeyey"],
     "pcstatus-pwds": ["bitcoin"],
-    "pcstart-pwds": ["bruh..."]
+    "pcstart-pwds": ["bruh..."],
+    "camera-entry-cmds": ["entrada"],
+    "camera-rout1-cmds": ["piano"],
+    "camera-rout2-cmds": ["ventana"],
+    "camera-last-img-cmds": ["ltima foto"],
+    "save-last-img-cmds": ["guarda"]
   }
 }
