@@ -193,3 +193,13 @@ def take_snapshot(cam_id):
 
 def save_last_img():
     return False
+
+
+# f = open('zzzzzzzz.jpg', 'rb')
+# response = bot.sendPhoto(chat_id, f)
+
+# 'URL="' + url + '"; wget "$URL" -O ' + path + 'last_snapshot.jpg'
+
+# import os
+
+# os.system("echo Hello from the other side!")

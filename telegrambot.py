@@ -4,7 +4,7 @@
 from time import strftime, localtime, sleep
 import telepot
 from telepot.loop import MessageLoop
-from functions import insert_on_log, TelegramUser, does_it_contain, send_status, load_json_file, dump_json_file, send_status, action_pc, random_answer
+from functions import insert_on_log, TelegramUser, does_it_contain, send_status, load_json_file, dump_json_file, send_status, action_pc, random_answer, save_last_img, take_snapshot
 
 """
 This script controls a Telegram bot, to make sure that it is possible to power
