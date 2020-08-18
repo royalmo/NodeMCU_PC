@@ -73,25 +73,25 @@ def handle(msg):
         elif does_it_contain(message, "camera-entry-cmds", json_commands) and user.op != "1":
             bot.sendMessage(chat_id, json_answers["camera-response"])
             try:
-                bot.sendPhoto(chat_id, take_snapshot(0))
+                take_snapshot(bot, chat_id, 0)
             except:
                 bot.sendMessage(chat_id, json_answers["camera-error"])
         elif does_it_contain(message, "camera-rout1-cmds", json_commands) and user.op != "1":
             bot.sendMessage(chat_id, json_answers["camera-response"])
             try:
-                bot.sendPhoto(chat_id, take_snapshot(1))
+                take_snapshot(bot, chat_id, 1)
             except:
                 bot.sendMessage(chat_id, json_answers["camera-error"])
         elif does_it_contain(message, "camera-rout2-cmds", json_commands) and user.op != "1":
             bot.sendMessage(chat_id, json_answers["camera-response"])
             try:
-                bot.sendPhoto(chat_id, take_snapshot(2))
+                take_snapshot(bot, chat_id, 2)
             except:
                 bot.sendMessage(chat_id, json_answers["camera-error"])
         elif does_it_contain(message, "camera-last-img-cmds", json_commands) and user.op != "1":
             bot.sendMessage(chat_id, json_answers["camera-last-img-response"])
             try:
-                bot.sendPhoto(chat_id, take_snapshot(-1))
+                take_snapshot(bot, chat_id, -1)
             except:
                 bot.sendMessage(chat_id, json_answers["camera-error"])
         elif does_it_contain(message, "save-last-img-cmds", json_commands) and user.op != "1":

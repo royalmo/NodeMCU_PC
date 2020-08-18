@@ -8,6 +8,7 @@ from requests import get
 from json import loads, dumps
 from pathlib import Path
 from os import system
+import telepot
 
 """
 This script contains most important functions for all python files that need some.
@@ -189,11 +190,11 @@ def random_answer(json_answers):
 
 ## FUNCTIONS FOR ACCESSING CAMERA STUFF & SAVE IT
 
-def take_snapshot(cam_id):
+def take_snapshot(bot, chat_id, cam_id):
     if cam_id != -1:
         system('URL="' + load_json_file("config.json")["snapshot-urls"][cam_id] + '"; wget "$URL" -O ' + get_path() + 'last_snapshot.jpg')
     with open(get_path() + "last_snapshot.jpg", "rb") as photo:
-        return photo
+        bot.sendPhoto(chat_id, photo)
 
 def save_last_img():
     try:
