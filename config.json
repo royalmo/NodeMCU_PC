@@ -12,6 +12,12 @@
   ],
 
   "save-path": "/home/pi/NodeMCU_PC/media",
+  "music-folder": "/home/pi/NodeMCU_PC/audio",
+
+  "auto-playback": 0,
+  "auto-playback-hours": [
+      [[10, 0], [20, 0]]
+  ],
 
   "subnet-mask": [255, 255, 255, 0],
   "gateway": [192, 168, 1, 0],

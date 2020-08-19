@@ -1,0 +1,10 @@
+{
+    "currently-playing": {
+        "filename": "name",
+        "duration": "duration",
+        "cursor": "some-time",
+        "status": "play-pause-stopped"
+    },
+
+    "request": 0
+}
