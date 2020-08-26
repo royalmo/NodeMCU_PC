@@ -22,7 +22,8 @@ if __name__ == "__main__":
 
     update_config()
     
-    p = vlc.MediaPlayer(audio_file_path)
+    p = vlc.MediaPlayer("/home/pi/NodeMCU_PC/audio/001_Ristar_Crazy_Kings.mp3")
+    print(p.audio_output_set( "default" ))
     p.play()
     sleep(2)
     p.pause()
