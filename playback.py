@@ -42,6 +42,7 @@ class PlayList:
             self.enabled       = use_import["enabled"]
             self.current_song  = use_import["current"]
             self.repeats_every = use_import["repeats"]
+            self.song_folder   = use_import["song_folder"]
 
         # Validating times and lists
         assert (self.start_time < self.end_time) if self.start_time is not None else (self.start_time == self.end_time)
@@ -149,7 +150,8 @@ class PlayList:
             "end_time"   : self.end_time,
             "enabled"    : self.enabled,
             "current"    : self.current_song,
-            "repeats"    : self.repeats_every
+            "repeats"    : self.repeats_every,
+            "song_folder": self.song_folder
         }
 
 class PlayListHandler:
