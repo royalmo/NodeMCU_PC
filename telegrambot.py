@@ -136,7 +136,7 @@ def handle(msg):
                 except:
                     bot.sendMessage(chat_id, json_answers["playlist-created-fail"])
                 else:
-                    ph.new_playlist(pl_id, get_path()+pl_folder, pl_start, pl_end, pl_repeat)
+                    ph.new_playlist(pl_id, pl_folder, pl_start, pl_end, pl_repeat)
                     bot.sendMessage(chat_id, json_answers["playlist-created-success"])
 
         elif does_it_contain(message, "playlist-edit-cmds", json_commands) and user.op == "3":
@@ -153,7 +153,7 @@ def handle(msg):
                 except:
                     bot.sendMessage(chat_id, json_answers["playlist-edited-fail"])
                 else:
-                    ph.edit_playlist(pl_id, get_path()+pl_folder, pl_start, pl_end, pl_repeat)
+                    ph.edit_playlist(pl_id, pl_folder, pl_start, pl_end, pl_repeat)
                     bot.sendMessage(chat_id, json_answers["playlist-edited-success"])
 
         elif does_it_contain(message, "playlist-delete-cmds", json_commands) and user.op == "3":
