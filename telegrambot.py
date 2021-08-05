@@ -110,7 +110,7 @@ def handle(msg):
                 "".join([ json_answers["playlist-list-line"].format(
                     "ON" if ans[1] else "OFF", ans[0], json_answers["playlist-list-playing"] if ans[2] else ""
                 ) for ans in ph.get_playlists_info()])
-            ))
+            ), parse_mode="Markdown")
             
         elif does_it_contain(message, "playlist-get-info-cmds", json_commands):
             pl_id = message.split()[-1]
@@ -215,7 +215,7 @@ if __name__ == "__main__":
     json_answers = json_file["answers"]
     json_commands = json_file["commands"]
 
-    ph = PlayListHandler( get_path() + "playback.py" )
+    ph = PlayListHandler( get_path() + "playlists.json" )
     ph.main_folder = config_log["music-folder"] + "/"
 
     #STARTS BOT, AND INFINITE LOOP TO KEEP IT RUNNING
