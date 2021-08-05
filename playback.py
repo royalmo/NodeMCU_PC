@@ -10,6 +10,7 @@ m = alsaaudio.Mixer('Headphone')
 m.setvolume(100)
 
 # Starting the player
+pygame.init()
 pygame.mixer.pre_init(devicename="bcm2835 Headphones, bcm2835 Headphones")
 pygame.mixer.init()
 player = pygame.mixer.music
@@ -98,8 +99,7 @@ class PlayList:
             
     def start(self):
         self.__playing = True
-        # The first song is loaded differently
-        player.load(self.song_paths[self.current_song])
+        self.__load_first()
         player.play()
         self.__queue_next()
 
@@ -109,10 +109,26 @@ class PlayList:
 
     def is_playing(self):
         return self.__playing
-    
+
+    def __load_first(self):
+        # The first song is loaded differently
+        while True:
+            try:
+                player.load(self.song_paths[self.current_song])
+                break
+            except pygame.error:
+                self.current_song = ( self.current_song + 1 ) % len( self.song_paths )
+
     def __queue_next(self):
-        self.current_song = ( self.current_song + 1 ) % len( self.song_paths )
-        player.queue(self.song_paths[self.current_song])
+        # As some songs may be corrupted or not found, we skip them instead of
+        # crashing the enitre program.
+        while True:
+            try:
+                self.current_song = ( self.current_song + 1 ) % len( self.song_paths )
+                player.queue(self.song_paths[self.current_song])
+                break
+            except pygame.error:
+                pass
 
     def append_song_if_needed(self):
         for event in pygame.event.get():
