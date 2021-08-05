@@ -160,6 +160,7 @@ def handle(msg):
             if message.split()[-1] not in ph.get_playlists_ids():
                 bot.sendMessage(chat_id, json_answers["playlist-deleted-fail"])
             else:
+                pl_id = message.split()[-1]
                 ph.delete_playlist(pl_id)
                 bot.sendMessage(chat_id, json_answers["playlist-deleted-success"])
 
@@ -167,6 +168,7 @@ def handle(msg):
             if message.split()[-1] not in ph.get_playlists_ids():
                 bot.sendMessage(chat_id, json_answers["playlist-enable-disable-fail"])
             else:
+                pl_id = message.split()[-1]
                 ph.change_status_playlist(pl_id, enabled=True)
                 bot.sendMessage(chat_id, json_answers["playlist-enable-success"])
 
@@ -174,6 +176,7 @@ def handle(msg):
             if message.split()[-1] not in ph.get_playlists_ids():
                 bot.sendMessage(chat_id, json_answers["playlist-enable-disable-fail"])
             else:
+                pl_id = message.split()[-1]
                 ph.change_status_playlist(pl_id, enabled=False)
                 bot.sendMessage(chat_id, json_answers["playlist-disable-success"])
 
