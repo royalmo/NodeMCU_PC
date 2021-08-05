@@ -133,8 +133,8 @@ def handle(msg):
                     pl_hour, pl_min, pl_sec = [int(x) for x in pl_date2.split(":")]
                     pl_start = datetime(pl_year, pl_month, pl_day, pl_hour, pl_min, pl_sec).timestamp()
 
-                    pl_end = pl_start + float(pl_duration)
-                    pl_repeat = float(pl_repeat)
+                    pl_end = pl_start + (float(pl_duration)*3600)
+                    pl_repeat = float(pl_repeat)*3600
 
                     assert pl_id not in ph.get_playlists_ids()
                 except:

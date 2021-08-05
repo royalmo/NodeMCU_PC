@@ -194,6 +194,7 @@ class PlayListHandler:
         return [(key, pl.enabled, pl.is_playing()) for key, pl in self.playlists.items()]
 
     def get_info_of(self, pl_id):
+        pl_id = pl_id.upper()
         assert pl_id in self.playlists.keys()
         pl = self.playlists[pl_id]
 
@@ -208,11 +209,13 @@ class PlayListHandler:
             pl.update()
 
     def new_playlist(self, pl_id, pl_folder, pl_start, pl_end, pl_repeat):
+        pl_id = pl_id.upper()
         self.playlists[pl_id] = PlayList(song_folder=self.main_folder+pl_folder, start_time=pl_start, end_time=pl_end, repeats_every=pl_repeat)
 
         self.save_playlists()
 
     def edit_playlist(self, pl_id, pl_folder, pl_start, pl_end, pl_repeat):
+        pl_id = pl_id.upper()
         self.playlists[pl_id].song_folder = self.main_folder+pl_folder
         self.playlists[pl_id].start_time = pl_start
         self.playlists[pl_id].end_time = pl_end
@@ -224,6 +227,7 @@ class PlayListHandler:
         self.save_playlists()
 
     def delete_playlist(self, pl_id):
+        pl_id = pl_id.upper()
         self.playlists[pl_id].enabled = False
         self.playlists[pl_id].update()
         del self.playlists[pl_id]
@@ -231,6 +235,7 @@ class PlayListHandler:
         self.save_playlists()
 
     def change_status_playlist(self, pl_id, enabled):
+        pl_id = pl_id.upper()
         self.playlists[pl_id].enabled = enabled
         self.playlists[pl_id].update()
 
