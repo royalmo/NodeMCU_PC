@@ -74,7 +74,10 @@ class PlayList:
             self.start_time -= self.repeats_every
             self.end_time -= self.repeats_every
 
-        while self.end_time > current_time:
+        if self.is_in_play_time():
+            return
+
+        while self.start_time < current_time:
             self.start_time += self.repeats_every
             self.end_time += self.repeats_every
 
@@ -183,7 +186,7 @@ class PlayListHandler:
         self.playlists[pl_id] = PlayList(song_folder=self.main_folder+pl_folder, start_time=pl_start, end_time=pl_end, repeats_every=pl_repeat)
 
     def edit_playlist(self, pl_id, pl_folder, pl_start, pl_end, pl_repeat):
-        self.playlists[pl_id].song_folder = pl_folder
+        self.playlists[pl_id].song_folder = self.main_folder+pl_folder
         self.playlists[pl_id].start_time = pl_start
         self.playlists[pl_id].end_time = pl_end
         self.playlists[pl_id].repeats_every = pl_repeat
