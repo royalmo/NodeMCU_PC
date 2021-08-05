@@ -46,10 +46,10 @@ class PlayList:
         assert len(self.song_paths) > 0
 
     def update_folder(self):
-        if self.song_folder[-1] !=  "/":
-            self.song_folder += "/"
+        if self.song_folder[-1] ==  "/":
+            self.song_folder = self.song_folder[:-1]
 
-        self.song_paths = [self.song_folder + song for song in listdir(self.song_folder)]
+        self.song_paths = [self.song_folder + "/" + song for song in listdir(self.song_folder)]
 
     def shuffle(self):
         shuffle(self.song_paths)
