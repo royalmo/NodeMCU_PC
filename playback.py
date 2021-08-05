@@ -1,6 +1,7 @@
 import pygame
 import alsaaudio
 from time import sleep, time
+from datetime import datetime
 from os import listdir
 from random import shuffle
 from json import loads, dumps
@@ -193,7 +194,8 @@ class PlayListHandler:
     def get_info_of(self, pl_id):
         assert pl_id in self.playlists.keys()
         pl = self.playlists[pl_id]
-        return (pl_id, pl.song_folder, pl.start_time, pl.end_time-pl.start_time, pl.repeats_every)
+        formatted_start = datetime.utcfromtimestamp(pl.start_time).strftime('%Y-%m-%d %H:%M:%S')
+        return (pl_id, pl.song_folder, formatted_start, (pl.end_time-pl.start_time)/3600, pl.repeats_every/3600)
 
     def update(self):
         for pl in self.playlists.values():
@@ -201,6 +203,8 @@ class PlayListHandler:
 
     def new_playlist(self, pl_id, pl_folder, pl_start, pl_end, pl_repeat):
         self.playlists[pl_id] = PlayList(song_folder=self.main_folder+pl_folder, start_time=pl_start, end_time=pl_end, repeats_every=pl_repeat)
+
+        self.save_playlists()
 
     def edit_playlist(self, pl_id, pl_folder, pl_start, pl_end, pl_repeat):
         self.playlists[pl_id].song_folder = self.main_folder+pl_folder
@@ -211,14 +215,20 @@ class PlayListHandler:
         self.playlists[pl_id].update_folder()
         self.playlists[pl_id].update()
 
+        self.save_playlists()
+
     def delete_playlist(self, pl_id):
         self.playlists[pl_id].enabled = False
         self.playlists[pl_id].update()
         del self.playlists[pl_id]
 
+        self.save_playlists()
+
     def change_status_playlist(self, pl_id, enabled):
         self.playlists[pl_id].enabled = enabled
         self.playlists[pl_id].update()
+
+        self.save_playlists()
 
 
 if __name__ == "__main__":

@@ -50,19 +50,19 @@
     "playlist-edited-success" : "Playlist editada correctamente.",
     "playlist-deleted-success" : "Playlist eliminada correctamente",
 
-    "playlist-created-fail" : "Hubo un error al crear la playlist.\nFormato: \"Nueva playlist ID FOLDER START_TIME DURATION REPEAT\"",
-    "playlist-edited-fail" : "Hubo un error al modificar la playlist, no se han aplicado los cambios.\nFormato: \"Editar playlist ID FOLDER START_TIME DURATION REPEAT\"",
+    "playlist-created-fail" : "Hubo un error al crear la playlist.\nFormato: \"Nueva playlist ID FOLDER YYYY/MM/DD hh:mm:ss DURATION(h) REPEAT(h)\"",
+    "playlist-edited-fail" : "Hubo un error al modificar la playlist, no se han aplicado los cambios.\nFormato: \"Editar playlist ID FOLDER YYYY/MM/DD hh:mm:ss DURATION(h) REPEAT(h)\"",
     "playlist-deleted-fail" : "No se ha podido eliminar la playlist, existe este ID?",
 
     "playlist-info-fail" : "No se puede mostrar la info de esta playlist ya que no se ha encontrado, prueba con otro ID.",
-    "playlist-info-msg" : "La playlist con ID {} usa la carpeta {}, empieza en {}, dura {} segundos y se repite cada {} segundos",
+    "playlist-info-msg" : "La playlist con ID `{}` usa la carpeta `{}`, tiene inicio `{}`, dura {} horas y se repite cada {} horas",
 
     "playlist-enable-disable-fail" : "No se ha podido cambiar el estado de la playlist con este ID. Realmente existe?",
     "playlist-enable-success" : "La playlist ha sido activada correctamente.",
     "playlist-disable-success" : "La playlist ha sido desactivada correctamente.",
 
-    "playlist-list-header" : "**Playlists guardadas en este bot**{}",
-    "playlist-list-line" : "\n[{}] {}{}",
+    "playlist-list-header" : "*Playlists guardadas en este bot*{}",
+    "playlist-list-line" : "\n\\]{}\\]; `{}`{}",
     "playlist-list-playing" : " *Sonando ahora!*",
 
     "else-messages": [

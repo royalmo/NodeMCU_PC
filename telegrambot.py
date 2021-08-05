@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from time import strftime, localtime, sleep
+from datetime import datetime
 import telepot
 from telepot.loop import MessageLoop
 from functions import insert_on_log, TelegramUser, does_it_contain, send_status, load_json_file, dump_json_file, send_status, action_pc, random_answer, save_last_img, take_snapshot, get_path
@@ -123,14 +124,17 @@ def handle(msg):
                 ))
 
         elif does_it_contain(message, "playlist-new-cmds", json_commands) and user.op == "3":
-            if len(message.split()) != 7:
+            if len(message.split()) != 8:
                 bot.sendMessage(chat_id, json_answers["playlist-created-fail"])
             else:
-                pl_id, pl_folder, pl_start, pl_duration, pl_repeat = message.split()[2:]
+                pl_id, pl_folder, pl_date1, pl_date2, pl_duration, pl_repeat = message.split()[2:]
                 try:
-                    pl_start = int(pl_start)
-                    pl_end = pl_start + int(pl_duration)
-                    pl_repeat = int(pl_repeat)
+                    pl_year, pl_month, pl_day = [int(x) for x in pl_date1.split("/")]
+                    pl_hour, pl_min, pl_sec = [int(x) for x in pl_date2.split(":")]
+                    pl_start = datetime(pl_year, pl_month, pl_day, pl_hour, pl_min, pl_sec).timestamp()
+
+                    pl_end = pl_start + float(pl_duration)
+                    pl_repeat = float(pl_repeat)
 
                     assert pl_id not in ph.get_playlists_ids()
                 except:
@@ -140,14 +144,17 @@ def handle(msg):
                     bot.sendMessage(chat_id, json_answers["playlist-created-success"])
 
         elif does_it_contain(message, "playlist-edit-cmds", json_commands) and user.op == "3":
-            if len(message.split()) != 7:
+            if len(message.split()) != 8:
                 bot.sendMessage(chat_id, json_answers["playlist-edited-fail"])
             else:
-                pl_id, pl_folder, pl_start, pl_duration, pl_repeat = message.split()[2:]
+                pl_id, pl_folder, pl_date1, pl_date2, pl_duration, pl_repeat = message.split()[2:]
                 try:
-                    pl_start = int(pl_start)
-                    pl_end = pl_start + int(pl_duration)
-                    pl_repeat = int(pl_repeat)
+                    pl_year, pl_month, pl_day = [int(x) for x in pl_date1.split("/")]
+                    pl_hour, pl_min, pl_sec = [int(x) for x in pl_date2.split(":")]
+                    pl_start = datetime(pl_year, pl_month, pl_day, pl_hour, pl_min, pl_sec).timestamp()
+
+                    pl_end = pl_start + float(pl_duration)
+                    pl_repeat = float(pl_repeat)
 
                     assert pl_id in ph.get_playlists_ids()
                 except:
