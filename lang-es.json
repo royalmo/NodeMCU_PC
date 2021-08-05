@@ -38,7 +38,6 @@
     "camera-error": "No he podido acceder a la foto de la webcam, lo siento...",
     "save-photo": "\u00a1He conservado su foto para siempre, al lado del disco duro!",
     "pc-stages": ["apagado", "encendido"],
-    "cams": [" la entrada", "l piano", " la ventana"],
     "pcstatus-answer": [
       "Hoy, {} a las {}, la computadora estaba en el estado {}, y el interruptor del ventilador se encontraba en la posici\u00f3n n\u00famero {}. ",
       "Puede encender y apagar la computadora.",
@@ -46,6 +45,26 @@
       "No puede hacer nada."
     ],
     "pwd-failed": "Tonto quien lo lea, AAHAHAHAHAHAH TOMA INDIRECTA PRINGAO QUE NO TE SABES NI LAS CONTRAS.",
+
+    "playlist-created-success" : "Playlist creada correctamente.",
+    "playlist-edited-success" : "Playlist editada correctamente.",
+    "playlist-deleted-success" : "Playlist eliminada correctamente",
+
+    "playlist-created-fail" : "Hubo un error al crear la playlist.\nFormato: \"Nueva playlist ID FOLDER START_TIME DURATION REPEAT\"",
+    "playlist-edited-fail" : "Hubo un error al modificar la playlist, no se han aplicado los cambios.\nFormato: \"Editar playlist ID FOLDER START_TIME DURATION REPEAT\"",
+    "playlist-deleted-fail" : "No se ha podido eliminar la playlist, existe este ID?",
+
+    "playlist-info-fail" : "No se puede mostrar la info de esta playlist ya que no se ha encontrado, prueba con otro ID.",
+    "playlist-info-msg" : "La playlist con ID {} usa la carpeta {}, empieza en {}, dura {} segundos y se repite cada {} segundos",
+
+    "playlist-enable-disable-fail" : "No se ha podido cambiar el estado de la playlist con este ID. Realmente existe?",
+    "playlist-enable-success" : "La playlist ha sido activada correctamente.",
+    "playlist-disable-success" : "La playlist ha sido desactivada correctamente.",
+
+    "playlist-list-header" : "**Playlists guardadas en este bot**{}",
+    "playlist-list-line" : "\n[{}] {}{}",
+    "playlist-list-playing" : " *Sonando ahora!*",
+
     "else-messages": [
       "Lo siento, pero me llamo Osvaldo, no Alexa, y en consecuente no dispongo de infinitas respuestas para tus mierdas.",
       "Mira que eres pesado, que he dicho que no quiero una licuadora...",
@@ -168,6 +187,13 @@
     "camera-rout1-cmds": ["piano", "Piano"],
     "camera-rout2-cmds": ["ventana", "Ventana"],
     "camera-last-img-cmds": ["ltima foto"],
-    "save-last-img-cmds": ["guarda", "Guarda"]
+    "save-last-img-cmds": ["guarda", "Guarda"],
+    "playlist-list-cmds" : ["laylists"],
+    "playlist-new-cmds" : ["ueva playlist"],
+    "playlist-edit-cmds" : ["ditar playlist"],
+    "playlist-enable-cmds" : ["Activar playlist"],
+    "playlist-disable-cmds" : ["esactivar playlist"],
+    "playlist-delete-cmds" : ["liminar playlist"],
+    "playlist-get-info-cmds" : ["nfo playlist"]
   }
 }

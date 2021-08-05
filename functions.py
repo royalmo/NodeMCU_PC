@@ -39,7 +39,7 @@ def load_json_file(file_path):
 
 def dump_json_file(file_path, json_file):
     with open((get_path() + file_path), "w") as fileout:
-        fileout.write(dumps(json_file))
+        fileout.write(dumps(json_file, indent=4))
 
 ## THIS FUNCTION MANAGES ALL MCU REQUESTS, AND UPDATES IF NECESSARY
 

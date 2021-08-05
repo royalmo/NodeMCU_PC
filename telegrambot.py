@@ -4,7 +4,9 @@
 from time import strftime, localtime, sleep
 import telepot
 from telepot.loop import MessageLoop
-from functions import insert_on_log, TelegramUser, does_it_contain, send_status, load_json_file, dump_json_file, send_status, action_pc, random_answer, save_last_img, take_snapshot
+from functions import insert_on_log, TelegramUser, does_it_contain, send_status, load_json_file, dump_json_file, send_status, action_pc, random_answer, save_last_img, take_snapshot, get_path
+
+from playback import PlayListHandler
 
 """
 This script controls a Telegram bot, to make sure that it is possible to power
@@ -101,6 +103,80 @@ def handle(msg):
                 bot.sendMessage(chat_id, json_answers["camera-error"])
             else:
                 bot.sendMessage(chat_id, json_answers["save-photo"])
+
+        # Playlist stuff
+        elif does_it_contain(message, "playlist-list-cmds", json_commands):
+            bot.sendMessage(chat_id, json_answers["playlist-list-header"].format(
+                "".join([ json_answers["playlist-list-line"].format(
+                    "ON" if ans[1] else "OFF", ans[0], json_answers["playlist-list-playing"] if ans[2] else ""
+                ) for ans in ph.get_playlists_info()])
+            ))
+            
+        elif does_it_contain(message, "playlist-get-info-cmds", json_commands):
+            pl_id = message.split()[-1]
+            if pl_id not in ph.get_playlists_ids():
+                bot.sendMessage(chat_id, json_answers["playlist-info-fail"])
+            else:
+                pl_info = ph.get_info_of(pl_id)
+                bot.sendMessage(chat_id, json_answers["playlist-info-msg"].format(
+                    *pl_info
+                ))
+
+        elif does_it_contain(message, "playlist-new-cmds", json_commands) and user.op == "3":
+            if len(message.split()) != 7:
+                bot.sendMessage(chat_id, json_answers["playlist-created-fail"])
+            else:
+                pl_id, pl_folder, pl_start, pl_duration, pl_repeat = message.split()[2:]
+                try:
+                    pl_start = int(pl_start)
+                    pl_end = pl_start + int(pl_duration)
+                    pl_repeat = int(pl_repeat)
+
+                    assert pl_id not in ph.get_playlists_ids()
+                except:
+                    bot.sendMessage(chat_id, json_answers["playlist-created-fail"])
+                else:
+                    ph.new_playlist(pl_id, get_path()+pl_folder, pl_start, pl_end, pl_repeat)
+                    bot.sendMessage(chat_id, json_answers["playlist-created-success"])
+
+        elif does_it_contain(message, "playlist-edit-cmds", json_commands) and user.op == "3":
+            if len(message.split()) != 7:
+                bot.sendMessage(chat_id, json_answers["playlist-edited-fail"])
+            else:
+                pl_id, pl_folder, pl_start, pl_duration, pl_repeat = message.split()[2:]
+                try:
+                    pl_start = int(pl_start)
+                    pl_end = pl_start + int(pl_duration)
+                    pl_repeat = int(pl_repeat)
+
+                    assert pl_id in ph.get_playlists_ids()
+                except:
+                    bot.sendMessage(chat_id, json_answers["playlist-edited-fail"])
+                else:
+                    ph.edit_playlist(pl_id, get_path()+pl_folder, pl_start, pl_end, pl_repeat)
+                    bot.sendMessage(chat_id, json_answers["playlist-edited-success"])
+
+        elif does_it_contain(message, "playlist-delete-cmds", json_commands) and user.op == "3":
+            if message.split()[-1] not in ph.get_playlists_ids():
+                bot.sendMessage(chat_id, json_answers["playlist-deleted-fail"])
+            else:
+                ph.delete_playlist(pl_id)
+                bot.sendMessage(chat_id, json_answers["playlist-deleted-success"])
+
+        elif does_it_contain(message, "playlist-enable-cmds", json_commands) and user.op == "3":
+            if message.split()[-1] not in ph.get_playlists_ids():
+                bot.sendMessage(chat_id, json_answers["playlist-enable-disable-fail"])
+            else:
+                ph.change_status_playlist(pl_id, enabled=True)
+                bot.sendMessage(chat_id, json_answers["playlist-enable-success"])
+
+        elif does_it_contain(message, "playlist-disable-cmds", json_commands) and user.op == "3":
+            if message.split()[-1] not in ph.get_playlists_ids():
+                bot.sendMessage(chat_id, json_answers["playlist-enable-disable-fail"])
+            else:
+                ph.change_status_playlist(pl_id, enabled=False)
+                bot.sendMessage(chat_id, json_answers["playlist-disable-success"])
+
         else:
             bot.sendMessage(chat_id, random_answer(json_answers))
     else:
@@ -139,8 +215,14 @@ if __name__ == "__main__":
     json_answers = json_file["answers"]
     json_commands = json_file["commands"]
 
+    ph = PlayListHandler( get_path() + "playback.py" )
+    ph.main_folder = config_log["music-folder"] + "/"
+
     #STARTS BOT, AND INFINITE LOOP TO KEEP IT RUNNING
     MessageLoop(bot, handle).run_as_thread()
     while 1:
-        sleep(10)
+        for _ in range(10):
+            sleep(1)
+            ph.update()
         send_notifications()
+        ph.save_playlists()
