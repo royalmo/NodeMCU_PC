@@ -98,7 +98,8 @@ class PlayList:
             
     def start(self):
         self.__playing = True
-        self.__queue_next()
+        # The first song is loaded differently
+        player.load(self.song_paths[self.current_song])
         player.play()
         self.__queue_next()
 
