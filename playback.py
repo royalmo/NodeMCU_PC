@@ -139,17 +139,23 @@ class PlayListHandler:
         self.newplaylistid = None
         self.main_folder = ""
 
-    def load_playlists(self, filepath = self.filepath):
+    def load_playlists(self, filepath = None):
         """
         When the playlists are stored in a json file in ``filepath``, we load them and
         return the resulting dict.
         """
+        if filepath is None:
+            filepath = self.filepath
+
         with open(filepath, "r") as f:
             json_data = loads(f.read())
 
         self.playlists = {pl_id : PlayList(use_import=pl_data) for pl_id, pl_data in json_data.items()}
 
-    def save_playlists(self, filepath = self.filepath):
+    def save_playlists(self, filepath = None):
+        if filepath is None:
+            filepath = self.filepath
+
         json_data = { pl_id : pl_data.export() for pl_id, pl_data in self.playlists.items()}
 
         with open(filepath, "w") as f:
