@@ -184,6 +184,9 @@ class PlayListHandler:
         with open(filepath, "w") as f:
             f.write(dumps(json_data, indent=4))
 
+    def id_exists(self, pl_id):
+        return pl_id.upper() in self.playlists.keys()
+
     def get_playlists_ids(self):
         return self.playlists.keys()
 
