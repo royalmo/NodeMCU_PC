@@ -194,8 +194,12 @@ class PlayListHandler:
     def get_info_of(self, pl_id):
         assert pl_id in self.playlists.keys()
         pl = self.playlists[pl_id]
+
         formatted_start = datetime.utcfromtimestamp(pl.start_time).strftime('%Y-%m-%d %H:%M:%S')
-        return (pl_id, pl.song_folder, formatted_start, (pl.end_time-pl.start_time)/3600, pl.repeats_every/3600)
+        duration = round((pl.end_time-pl.start_time)/3600, 2)
+        repeat = round(pl.repeats_every/3600, 2)
+
+        return (pl_id, pl.song_folder, formatted_start, duration, repeat)
 
     def update(self):
         for pl in self.playlists.values():

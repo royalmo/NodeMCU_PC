@@ -62,7 +62,7 @@
     "playlist-disable-success" : "La playlist ha sido desactivada correctamente.",
 
     "playlist-list-header" : "*Playlists guardadas en este bot*{}",
-    "playlist-list-line" : "\n\\]{}\\]; `{}`{}",
+    "playlist-list-line" : "\n\\[{}\\]; `{}`{}",
     "playlist-list-playing" : " *Sonando ahora!*",
 
     "else-messages": [

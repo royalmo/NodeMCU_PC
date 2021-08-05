@@ -121,7 +121,7 @@ def handle(msg):
                 pl_info = ph.get_info_of(pl_id)
                 bot.sendMessage(chat_id, json_answers["playlist-info-msg"].format(
                     *pl_info
-                ))
+                ), parse_mode="Markdown")
 
         elif does_it_contain(message, "playlist-new-cmds", json_commands) and user.op == "3":
             if len(message.split()) != 8:
