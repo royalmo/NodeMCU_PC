@@ -153,8 +153,8 @@ def handle(msg):
                     pl_hour, pl_min, pl_sec = [int(x) for x in pl_date2.split(":")]
                     pl_start = datetime(pl_year, pl_month, pl_day, pl_hour, pl_min, pl_sec).timestamp()
 
-                    pl_end = pl_start + float(pl_duration)
-                    pl_repeat = float(pl_repeat)
+                    pl_end = pl_start + (float(pl_duration)*3600)
+                    pl_repeat = float(pl_repeat)*3600
 
                     assert ph.id_exists(pl_id)
                 except:
@@ -164,7 +164,7 @@ def handle(msg):
                     bot.sendMessage(chat_id, json_answers["playlist-edited-success"])
 
         elif does_it_contain(message, "playlist-delete-cmds", json_commands) and user.op == "3":
-            if ph.id_exists(message.split()[-1]):
+            if not ph.id_exists(message.split()[-1]):
                 bot.sendMessage(chat_id, json_answers["playlist-deleted-fail"])
             else:
                 pl_id = message.split()[-1]
@@ -172,7 +172,7 @@ def handle(msg):
                 bot.sendMessage(chat_id, json_answers["playlist-deleted-success"])
 
         elif does_it_contain(message, "playlist-enable-cmds", json_commands) and user.op == "3":
-            if ph.id_exists(message.split()[-1]):
+            if not ph.id_exists(message.split()[-1]):
                 bot.sendMessage(chat_id, json_answers["playlist-enable-disable-fail"])
             else:
                 pl_id = message.split()[-1]
@@ -180,7 +180,7 @@ def handle(msg):
                 bot.sendMessage(chat_id, json_answers["playlist-enable-success"])
 
         elif does_it_contain(message, "playlist-disable-cmds", json_commands) and user.op == "3":
-            if ph.id_exists(message.split()[-1]):
+            if not ph.id_exists(message.split()[-1]):
                 bot.sendMessage(chat_id, json_answers["playlist-enable-disable-fail"])
             else:
                 pl_id = message.split()[-1]
