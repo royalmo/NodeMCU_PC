@@ -210,7 +210,7 @@ def send_notifications():
     for user, notification in jsonfile["notify"].items():
         if len(notification) > 1:
             bot.sendMessage(user, json_answers["notification_pc"].format(json_answers["pc-stages"][int(notification[0])], notification[1]))
-        elif notification in [0, 1, 2]:
+        elif notification in ["0", "1", "2"]:
             bot.sendMessage(user, json_answers["notification_cam"].format(json_answers["cams"][notification]))
             take_snapshot(bot, user, -1)
     jsonfile["notify"] = {}
@@ -230,9 +230,11 @@ if __name__ == "__main__":
 
     #STARTS BOT, AND INFINITE LOOP TO KEEP IT RUNNING
     MessageLoop(bot, handle).run_as_thread()
-    while 1:
+
+    while True:
         for _ in range(10):
             sleep(1)
             ph.update()
+
         send_notifications()
         ph.save_playlists()
