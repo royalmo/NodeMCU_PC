@@ -229,7 +229,7 @@ def send_notifications():
                 bot.sendMessage(user, json_answers["notification_pc"].format(json_answers["pc-stages"][int(notification[0])], notification[1]))
             elif notification in ["0", "1", "2"]:
                 bot.sendMessage(user, json_answers["notification_cam"].format(json_answers["cams"][int(notification)]))
-                take_snapshot(bot, user, -1)
+                take_snapshot(bot, user, int(notification))
     jsonfile["notify"] = {}
     dump_json_file("allowed_users.json", jsonfile)
 
