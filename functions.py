@@ -163,7 +163,8 @@ class TelegramUser(object):
         userlist = load_json_file("allowed_users.json")
         self.op = "0"
         self.status = "0"
-        for op_level in userlist:
+        for op in range(1, 4):
+            op_level = f"op-{op}"
             if self.id in userlist[op_level] and op_level != "notify":
                 self.op = op_level[3]
                 self.status = userlist[op_level][self.id]
