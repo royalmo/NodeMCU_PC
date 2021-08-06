@@ -199,3 +199,14 @@ def take_snapshot(bot, chat_id, cam_id):
 def save_last_img(date):
     newfile = load_json_file("config.json")["save-path"] + "/" + date + ".jpg"
     system("cp " + get_path() + "last_snapshot.jpg " + newfile)
+
+
+## NOTIFICATION - RELATED
+
+def get_notification_status():
+    return load_json_file("allowed_users.json")["notifications"]
+
+def set_notification_status(status):
+    info = load_json_file("allowed_users.json")
+    info["notifications"] = status
+    dump_json_file("allowed_users.json", info)

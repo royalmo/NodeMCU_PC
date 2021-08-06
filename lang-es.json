@@ -31,7 +31,7 @@
     "pcstatus-op1-received": "Dame una raz\u00f3n para que te pueda dar datos de la alta nobleza.",
     "pcstatus-op1-pwd-done": "Pregunt\u00e1ndole al s\u00fabdito delegado c\u00f3mo est\u00e1 el panorama.",
     "notification_pc": "Debo de comunicarle que ahora la computadora se encuentra en estado {}, con el FANswitch en posici\u00f3n {}.",
-    "notifiaction_cam": "Cuidado amig@, he detectado movimiento en la webcam situada en la zona de{}.",
+    "notification_cam": "Cuidado amig@, he detectado movimiento en la webcam situada en la zona de{}.",
     "cams" : [" la entrada", "l comedor", " la cocina"],
     "connection-error": "Ha habido un problema al conectar con el guiri del MCU, reintenta en un rato plis.",
     "camera-response": "Ahora le mando un plano de la sala :)",
@@ -65,6 +65,9 @@
     "playlist-list-header" : "*Playlists guardadas en este bot*:{}",
     "playlist-list-line" : "\n\\[{}] `{}`{}",
     "playlist-list-playing" : " *Sonando ahora!*",
+
+    "notifications-enabled" : "Las notificaciones se encuentran activadas.",
+    "notifications-disabled": "Las notificaciones se encuentran desactivadas",
 
     "else-messages": [
       "Lo siento, pero me llamo Osvaldo, no Alexa, y en consecuente no dispongo de infinitas respuestas para tus mierdas.",
@@ -195,6 +198,9 @@
     "playlist-enable-cmds" : ["Activar playlist"],
     "playlist-disable-cmds" : ["esactivar playlist"],
     "playlist-delete-cmds" : ["liminar playlist"],
-    "playlist-get-info-cmds" : ["nfo playlist"]
+    "playlist-get-info-cmds" : ["nfo playlist"],
+    "notifications-enable" : ["Activar notificaciones"],
+    "notifications-disable" : ["esactivar notificaciones"],
+    "notifications-status" : ["nfo notificaciones"]
   }
 }

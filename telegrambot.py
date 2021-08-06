@@ -5,7 +5,7 @@ from time import strftime, localtime, sleep
 from datetime import datetime
 import telepot
 from telepot.loop import MessageLoop
-from functions import insert_on_log, TelegramUser, does_it_contain, send_status, load_json_file, dump_json_file, send_status, action_pc, random_answer, save_last_img, take_snapshot, get_path
+from functions import insert_on_log, TelegramUser, does_it_contain, send_status, load_json_file, dump_json_file, send_status, action_pc, random_answer, save_last_img, take_snapshot, get_path, get_notification_status, set_notification_status
 
 from playback import PlayListHandler
 
@@ -187,6 +187,22 @@ def handle(msg):
                 ph.change_status_playlist(pl_id, enabled=False)
                 bot.sendMessage(chat_id, json_answers["playlist-disable-success"])
 
+        # Notification stuff
+        elif does_it_contain(message, "notifications-status", json_commands) and user.op == "3":
+            if get_notification_status():
+                bot.sendMessage(chat_id, json_answers["notifications-enabled"])
+            else:
+                bot.sendMessage(chat_id, json_answers["notifications-disabled"])
+
+        elif does_it_contain(message, "notifications-enable", json_commands) and user.op == "3":
+            set_notification_status(True)
+            bot.sendMessage(chat_id, json_answers["notifications-enabled"])
+
+        elif does_it_contain(message, "notifications-disable", json_commands) and user.op == "3":
+            set_notification_status(False)
+            bot.sendMessage(chat_id, json_answers["notifications-disabled"])
+
+
         else:
             bot.sendMessage(chat_id, random_answer(json_answers))
     else:
@@ -207,12 +223,13 @@ def send_notifications():
     global bot
     global json_answers
     jsonfile = load_json_file("allowed_users.json")
-    for user, notification in jsonfile["notify"].items():
-        if len(notification) > 1:
-            bot.sendMessage(user, json_answers["notification_pc"].format(json_answers["pc-stages"][int(notification[0])], notification[1]))
-        elif notification in ["0", "1", "2"]:
-            bot.sendMessage(user, json_answers["notification_cam"].format(json_answers["cams"][notification]))
-            take_snapshot(bot, user, -1)
+    if get_notification_status():
+        for user, notification in jsonfile["notify"].items():
+            if len(notification) > 1:
+                bot.sendMessage(user, json_answers["notification_pc"].format(json_answers["pc-stages"][int(notification[0])], notification[1]))
+            elif notification in ["0", "1", "2"]:
+                bot.sendMessage(user, json_answers["notification_cam"].format(json_answers["cams"][notification]))
+                take_snapshot(bot, user, -1)
     jsonfile["notify"] = {}
     dump_json_file("allowed_users.json", jsonfile)
 
