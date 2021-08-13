@@ -187,6 +187,14 @@ def handle(msg):
                 ph.change_status_playlist(pl_id, enabled=False)
                 bot.sendMessage(chat_id, json_answers["playlist-disable-success"])
 
+        elif does_it_contain(message, "playlist-shuffle-cmds", json_commands) and user.op == "3":
+            if not ph.id_exists(message.split()[-1]):
+                bot.sendMessage(chat_id, json_answers["playlist-shuffle-fail"])
+            else:
+                pl_id = message.split()[-1]
+                ph.shuffle_playlist(pl_id)
+                bot.sendMessage(chat_id, json_answers["playlist-shuffle-success"])
+
         # Notification stuff
         elif does_it_contain(message, "notifications-status", json_commands) and user.op == "3":
             if get_notification_status():

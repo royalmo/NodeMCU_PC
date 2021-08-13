@@ -62,6 +62,9 @@
     "playlist-enable-success" : "La playlist ha sido activada correctamente.",
     "playlist-disable-success" : "La playlist ha sido desactivada correctamente.",
 
+    "playlist-shuffle-success" : "La playlist {0} ha sido mezclada correctamente.",
+    "playlist-shuffle-fail" : "No se puede mezclar ninguna playlist llamada {0}",
+
     "playlist-list-header" : "*Playlists guardadas en este bot*:{}",
     "playlist-list-line" : "\n\\[{}] `{}`{}",
     "playlist-list-playing" : " *Sonando ahora!*",
@@ -199,6 +202,7 @@
     "playlist-disable-cmds" : ["esactivar playlist"],
     "playlist-delete-cmds" : ["liminar playlist"],
     "playlist-get-info-cmds" : ["nfo playlist"],
+    "playlist-shuffle-cmds" : ["ezclar playlist"],
     "notifications-enable" : ["Activar notificaciones"],
     "notifications-disable" : ["esactivar notificaciones"],
     "notifications-status" : ["nfo notificaciones"]

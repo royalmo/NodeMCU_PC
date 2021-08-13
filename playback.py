@@ -244,6 +244,11 @@ class PlayListHandler:
 
         self.save_playlists()
 
+    def shuffle_playlist(self, pl_id):
+        pl_id = pl_id.upper()
+
+        self.playlists[pl_id].shuffle()
+
 
 if __name__ == "__main__":
     print(listdir("."))
